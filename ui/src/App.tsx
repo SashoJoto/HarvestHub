@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import {fetchHelloMessage} from "./services/apiUtils.ts";
+import {SimpleApiControllerApi} from "./api";
+// import {fetchHelloMessage} from "./services/apiUtils.ts";
 
 function App() {
     const [message, setMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchHelloMessage()
-            .then((data) => setMessage(data))
+        const api = new SimpleApiControllerApi();
+        api.getMessage()
+            .then((data) => setMessage(data.data))
             .catch((error) => console.error(error));
     }, []);
 
