@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SimpleApiController {
 
-    @GetMapping("/api3/hello")
-    public String getMessage() {
-        return "Hello from Spring Boot Backend!";
+    @GetMapping("/api4/hello")
+    public User getMessage() {
+        User user = new User(Long.valueOf(1L), "Sashojoto");
+        return user;
     }
 }

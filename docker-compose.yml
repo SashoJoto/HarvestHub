@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17.0
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: harvesthub
+      POSTGRES_PASSWORD: harvesthub
+      POSTGRES_DB: HarvestHub
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

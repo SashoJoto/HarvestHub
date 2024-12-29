@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
-import {SimpleApiControllerApi} from "./api";
+import {SimpleApiControllerApi, User} from "./api";
 // import {fetchHelloMessage} from "./services/apiUtils.ts";
 
 function App() {
-    const [message, setMessage] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
         const api = new SimpleApiControllerApi();
         api.getMessage()
-            .then((data) => setMessage(data.data))
+            .then((data) => setUser(data.data))
             .catch((error) => console.error(error));
     }, []);
 
     return (
         <div>
             <h1>React Front End</h1>
-            <p>{message ?? 'Loading...'}</p>
+            <p>{user?.name ?? 'Loading...'}</p>
         </div>
     );
 }
