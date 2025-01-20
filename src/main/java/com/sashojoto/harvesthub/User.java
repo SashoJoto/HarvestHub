@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema
-@Entity
+@Entity(name = "Users")
 public class User {
     @Id
     private Long id;
