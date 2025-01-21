@@ -1,4 +1,4 @@
-package com.sashojoto.harvesthub;
+package com.sashojoto.harvesthub.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;

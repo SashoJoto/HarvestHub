@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: HarvestHub
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/HarvestHub
+    driver-class-name: org.postgresql.Driver
+    username: harvesthub
+    password: harvesthub
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    models-disabled: false

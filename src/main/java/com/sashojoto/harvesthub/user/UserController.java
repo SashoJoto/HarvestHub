@@ -1,4 +1,4 @@
-package com.sashojoto.harvesthub;
+package com.sashojoto.harvesthub.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
