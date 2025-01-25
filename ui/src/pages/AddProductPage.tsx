@@ -183,6 +183,7 @@ const AddProduct: React.FC = () => {
                                 <MenuItem value="USD">USD</MenuItem>
                                 <MenuItem value="EUR">EUR</MenuItem>
                                 <MenuItem value="GBP">GBP</MenuItem>
+                                <MenuItem value="GBP">BGN</MenuItem>
                             </Select>
                         </FormControl>
                     </Box>

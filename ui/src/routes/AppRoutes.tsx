@@ -7,7 +7,9 @@ import FavoritesPage from "../pages/FavoritesPage";
 import ChatPage from "../pages/ChatPage";
 import AddProductPage from "../pages/AddProductPage";
 import ProfilePage from "../pages/ProfilePage";
+import ProductPage from "../pages/ProductPage";
 
+// Add product id
 const AppRoutes: React.FC = () => {
     return (
         <Router>
@@ -19,7 +21,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="/chat" element={<ChatPage />} />
                 <Route path="/add-product" element={<AddProductPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-
+                <Route path="/product" element={<ProductPage />} />
                 {/* Redirect unknown routes to Home */}
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

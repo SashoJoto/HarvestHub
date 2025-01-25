@@ -34,13 +34,13 @@ const Product: React.FC<ProductProps> = ({
                 display: "flex",
                 alignItems: "flex-start",
                 padding: 3,
-                border: "1px solid #ddd",
+                backgroundColor: "rgb(34,47,50)",
                 borderRadius: 2,
                 boxShadow: 1,
                 gap: 3,
                 transition: "0.3s",
                 "&:hover": {
-                    boxShadow: 4,
+                    boxShadow: 6,
                 },
                 maxWidth: "900px", // Constrain width for consistent layout
                 width: "100%",
@@ -122,7 +122,6 @@ const Product: React.FC<ProductProps> = ({
                     variant="h6"
                     sx={{
                         fontWeight: "bold",
-                        color: "primary.main",
                     }}
                 >
                     {price}$
