@@ -5,10 +5,7 @@ import com.sashojoto.harvesthub.common.ShippingResponsibility;
 import com.sashojoto.harvesthub.common.Units;
 import com.sashojoto.harvesthub.user.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity(name = "Products")
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
     private String description;

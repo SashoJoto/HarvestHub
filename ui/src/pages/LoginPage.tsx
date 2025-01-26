@@ -34,14 +34,17 @@ const LoginPage: React.FC = () => {
         };
         authentication.login(loginRequest)
             .then(response => {
-                if(response.status === 200) {
-                    setIsLoggedIn(true); // Update login state
-                    localStorage.setItem("jwtToken", JSON.stringify(response.data));
+                if (response.status === 200) {
+                    setIsLoggedIn(true);
+                    let token: string = (response.data as { token: string }).token;
+                    if (token) {
+                        localStorage.setItem("jwtToken", token);
+                    }
                     navigate("/");
                 }
             })
             .catch(error => {
-                alert("Invalid credentials. Please try again. " + error.message );
+                alert("Invalid credentials. Please try again. " + error.message);
             });
     };
 

@@ -58,26 +58,8 @@ const AddProduct: React.FC = () => {
         }
     };
 
-    // Handle Quantity Unit Change
-    // const handleUnitChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    //     setQuantityUnit(event.target.value as string);
-    // };
-
-    // Handle Shipping Fee Toggle
-    // const handleShippingToggle = (
-    //     event: React.MouseEvent<HTMLElement>,
-    //     newShippingFee: string | null
-    // ) => {
-    //     if (newShippingFee) {
-    //         setShippingFee(newShippingFee);
-    //     }
-    // };
-
-    // Form Submission Handling
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        const productApi = new ProductControllerApi();
         let productDto: ProductDto = {
             name: formValues.productName,
             description: formValues.description,
@@ -88,6 +70,7 @@ const AddProduct: React.FC = () => {
             shippingResponsibility: formValues.shippingFee,
             // userId: session.userId,
         }
+        const productApi = new ProductControllerApi();
         productApi.createProduct(productDto)
             .then(response => {
                 console.log(response.data);
@@ -175,7 +158,7 @@ const AddProduct: React.FC = () => {
                                 required
                             >
                                 <MenuItem value={ProductDtoUnitsEnum.Kg}>Kg</MenuItem>
-                                <MenuItem value={ProductDtoUnitsEnum.Pcs}>Pcs</MenuItem>
+                                <MenuItem value={ProductDtoUnitsEnum.Pieces}>Pcs</MenuItem>
                                 <MenuItem value={ProductDtoUnitsEnum.Liters}>Liters</MenuItem>
                             </Select>
                         </FormControl>
@@ -209,8 +192,8 @@ const AddProduct: React.FC = () => {
                                 label="Currency"
                             >
                                 <MenuItem value={ProductDtoCurrencyEnum.Usd}>USD</MenuItem>
-                                <MenuItem value={ProductDTOCurrencyEnum.Eur}>EUR</MenuItem>
-                                <MenuItem value={ProductDTOCurrencyEnum.Gbp}>GBP</MenuItem>
+                                <MenuItem value={ProductDtoCurrencyEnum.Eur}>EUR</MenuItem>
+                                <MenuItem value={ProductDtoCurrencyEnum.Gbp}>GBP</MenuItem>
                                 <MenuItem value={ProductDtoCurrencyEnum.Bgn}>BGN</MenuItem>
                             </Select>
                         </FormControl>

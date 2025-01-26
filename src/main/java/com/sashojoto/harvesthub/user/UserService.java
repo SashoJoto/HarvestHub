@@ -29,4 +29,8 @@ public class UserService {
         List<User> users = userRepository.findByNameAndPassword(loginRequest.getUsername(), loginRequest.getPassword());
         return users.size() == 1;
     }
+
+    public User getUserByName(String name) {
+        return userRepository.findByName(name);
+    }
 }

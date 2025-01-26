@@ -3,6 +3,7 @@ package com.sashojoto.harvesthub.product;
 import com.sashojoto.harvesthub.user.User;
 import com.sashojoto.harvesthub.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +20,9 @@ public class ProductController {
     }
 
     @PostMapping("/api/product/create")
-    public ProductDto createProduct(@RequestBody ProductDto productDto) {
+    public ProductDto createProduct(@RequestBody ProductDto productDto, @AuthenticationPrincipal User principal) {
         Product product = mapper.toProduct(productDto);
-        User user = userService.getUser(productDto.getUserId());
+        User user = userService.getUserByName(principal.getName());
         product.setOwner(user);
 
         Product productCreated = productService.createProduct(product);
