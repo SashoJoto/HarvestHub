@@ -1,5 +1,6 @@
 import { createTheme } from "@mui/material/styles";
-
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 const theme = createTheme({
     palette: {
         primary: {

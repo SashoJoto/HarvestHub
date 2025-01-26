@@ -8,19 +8,36 @@ import {
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import MessageIcon from "@mui/icons-material/Message";
 import Navbar from "../components/Navbar"; // Assuming you have Navbar component
+import Slider from "react-slick"; // Import the slider
+import "slick-carousel/slick/slick.css"; // Import slick-carousel styles
+import "slick-carousel/slick/slick-theme.css";
+import raw_milk from "../assets/raw_milk.jpg";
+import raw_milk_2 from "../assets/raw_milk_2.jpg";
 
 const ProductPage: React.FC = () => {
     const product = {
-        title: "Amazing Product",
+        title: "Raw milk",
         images: [
-            "https://via.placeholder.com/800x450/FF0000",
-            "https://via.placeholder.com/800x450/00FF00",
-            "https://via.placeholder.com/800x450/0000FF",
+            raw_milk,
+            raw_milk_2,
         ],
         price: 199.99,
         description:
             "This amazing product comes with unparalleled quality and unique features. Perfect for anyone looking for excellence and performance. Don't miss your chance to own this spectacular item!",
         sellerContact: "john.doe@example.com",
+    };
+
+    // Slider settings for react-slick
+    const sliderSettings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        arrows: true,
+        autoplay: true,
+        autoplaySpeed: 3000,
+        pauseOnHover: true,
     };
 
     return (
@@ -43,21 +60,25 @@ const ProductPage: React.FC = () => {
                 </Typography>
 
                 {/* Image Slider */}
-                <Box sx={{ display: "flex", overflowX: "scroll", gap: 2, marginBottom: 4 }}>
-                    {product.images.map((src, index) => (
-                        <img
-                            key={index}
-                            src={src}
-                            alt={`Product Image ${index + 1}`}
-                            style={{
-                                width: "100%",
-                                maxWidth: "800px", // Limits slider image width
-                                height: "auto",
-                                borderRadius: "5px",
-                                boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-                            }}
-                        />
-                    ))}
+                <Box sx={{ marginBottom: 4 }}>
+                    <Slider {...sliderSettings}>
+                        {product.images.map((src, index) => (
+                            <div key={index}>
+                                <img
+                                    src={src}
+                                    alt={`Product Image ${index + 1}`}
+                                    style={{
+                                        width: "100%",
+                                        maxWidth: "800px", // Limits slider image width within the container
+                                        height: "auto",
+                                        margin: "0 auto",
+                                        borderRadius: "5px",
+                                        boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </Slider>
                 </Box>
 
                 {/* Price, Favorites, and Message Buttons */}
@@ -76,7 +97,7 @@ const ProductPage: React.FC = () => {
                         variant="h4"
                         sx={{
                             fontWeight: "bold",
-                            color: "primary.main",
+                            color: "white",
                         }}
                     >
                         ${product.price.toFixed(2)}

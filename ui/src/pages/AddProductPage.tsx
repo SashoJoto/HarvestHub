@@ -175,8 +175,8 @@ const AddProduct: React.FC = () => {
                                 required
                             >
                                 <MenuItem value={ProductDtoUnitsEnum.Kg}>Kg</MenuItem>
-                                <MenuItem value="pcs">Pcs</MenuItem>
-                                <MenuItem value="liters">Liters</MenuItem>
+                                <MenuItem value={ProductDtoUnitsEnum.Pcs}>Pcs</MenuItem>
+                                <MenuItem value={ProductDtoUnitsEnum.Liters}>Liters</MenuItem>
                             </Select>
                         </FormControl>
                     </Box>
@@ -208,9 +208,9 @@ const AddProduct: React.FC = () => {
                                 // }
                                 label="Currency"
                             >
-                                <MenuItem value="USD">USD</MenuItem>
-                                <MenuItem value="EUR">EUR</MenuItem>
-                                <MenuItem value="GBP">GBP</MenuItem>
+                                <MenuItem value={ProductDtoCurrencyEnum.Usd}>USD</MenuItem>
+                                <MenuItem value={ProductDTOCurrencyEnum.Eur}>EUR</MenuItem>
+                                <MenuItem value={ProductDTOCurrencyEnum.Gbp}>GBP</MenuItem>
                                 <MenuItem value={ProductDtoCurrencyEnum.Bgn}>BGN</MenuItem>
                             </Select>
                         </FormControl>
