@@ -1,42 +1,54 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import {
     Box,
     TextField,
     Button,
     Typography,
-    AppBar,
-    Toolbar,
-    IconButton,
+    // AppBar,
+    // Toolbar,
+    // IconButton,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import Navbar from "../components/Navbar"; // Assuming you have a Navbar component.
+// import MenuIcon from "@mui/icons-material/Menu";
+import Navbar from "../components/Navbar";
+import {Link, useNavigate} from "react-router-dom";
+import {AuthControllerApi, LoginRequest} from "../api"; // Assuming you have a Navbar component.
 
 // Login Page Component
 const LoginPage: React.FC = () => {
+    const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login state
-    const [credentials, setCredentials] = useState({ email: "", password: "" }); // Form state.
+    const [credentials, setCredentials] = useState({email: "", password: ""}); // Form state.
 
     // Handle form value changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setCredentials((prev) => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setCredentials((prev) => ({...prev, [name]: value}));
     };
 
     // Simulate login action
     const handleLogin = () => {
-        // Replace this with actual authentication logic (e.g., calling an API)
-        if (credentials.email === "test@example.com" && credentials.password === "password") {
-            setIsLoggedIn(true); // Update login state
-            alert("Login Successful!");
-        } else {
-            alert("Invalid credentials. Please try again.");
-        }
+        const authentication: AuthControllerApi = new AuthControllerApi();
+        let loginRequest: LoginRequest = {
+            username: credentials.email,
+            password: credentials.password
+        };
+        authentication.login(loginRequest)
+            .then(response => {
+                if(response.status === 200) {
+                    setIsLoggedIn(true); // Update login state
+                    localStorage.setItem("jwtToken", JSON.stringify(response.data));
+                    navigate("/");
+                }
+            })
+            .catch(error => {
+                alert("Invalid credentials. Please try again. " + error.message );
+            });
     };
 
     return (
         <>
             {/* Navbar */}
-            <Navbar />
+            <Navbar/>
 
             {/* Restricted Area - Show Login Form if Not Logged In */}
             {!isLoggedIn ? (
@@ -111,20 +123,20 @@ const LoginPage: React.FC = () => {
                 // Display Protected Content (After Login)
                 <Box
                     sx={{
-                        padding: { xs: 2, sm: 4 },
+                        padding: {xs: 2, sm: 4},
                         maxWidth: "800px",
                         margin: "0 auto",
                     }}
                 >
                     <Typography
                         variant="h5"
-                        sx={{ fontWeight: "bold", marginTop: 3, textAlign: "center" }}
+                        sx={{fontWeight: "bold", marginTop: 3, textAlign: "center"}}
                     >
                         Welcome to the Platform!
                     </Typography>
                     <Typography
                         variant="body1"
-                        sx={{ marginTop: 2, color: "text.secondary", textAlign: "center" }}
+                        sx={{marginTop: 2, color: "text.secondary", textAlign: "center"}}
                     >
                         You are now logged in. Feel free to explore the rest of the platform.
                     </Typography>
