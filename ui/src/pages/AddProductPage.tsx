@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import {
     Box,
     TextField,
@@ -12,20 +12,29 @@ import {
     Typography,
 } from "@mui/material";
 import Navbar from "../components/Navbar.tsx";
+import {
+    ProductControllerApi,
+    ProductDto,
+    ProductDtoCurrencyEnum,
+    ProductDtoShippingResponsibilityEnum,
+    ProductDtoUnitsEnum
+} from "../api";
 
 //Add image uploading
 //Fix UI
 
 
 const AddProduct: React.FC = () => {
-    const [shippingFee, setShippingFee] = useState("seller");
-    const [quantityUnit, setQuantityUnit] = useState("");
+    // const [shippingFee, setShippingFee] = useState("seller");
+    // const [quantityUnit, setQuantityUnit] = useState("");
     const [formValues, setFormValues] = useState({
         productName: "",
         description: "",
-        quantity: "",
-        price: "",
-        currency: "USD",
+        quantity: 0,
+        units: ProductDtoUnitsEnum.Kg,
+        price: 0,
+        currency: ProductDtoCurrencyEnum.Bgn,
+        shippingFee: ProductDtoShippingResponsibilityEnum.Buyer
     });
 
     const [errors, setErrors] = useState({
@@ -35,7 +44,7 @@ const AddProduct: React.FC = () => {
 
     // Handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormValues({
             ...formValues,
             [name]: value,
@@ -50,34 +59,53 @@ const AddProduct: React.FC = () => {
     };
 
     // Handle Quantity Unit Change
-    const handleUnitChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setQuantityUnit(event.target.value as string);
-    };
+    // const handleUnitChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    //     setQuantityUnit(event.target.value as string);
+    // };
 
     // Handle Shipping Fee Toggle
-    const handleShippingToggle = (
-        event: React.MouseEvent<HTMLElement>,
-        newShippingFee: string | null
-    ) => {
-        if (newShippingFee) {
-            setShippingFee(newShippingFee);
-        }
-    };
+    // const handleShippingToggle = (
+    //     event: React.MouseEvent<HTMLElement>,
+    //     newShippingFee: string | null
+    // ) => {
+    //     if (newShippingFee) {
+    //         setShippingFee(newShippingFee);
+    //     }
+    // };
 
     // Form Submission Handling
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Check for validation errors
-        if (!formValues.productName || !formValues.description || !formValues.quantity || errors.quantity || errors.price) {
-            alert("Please fill in all required fields with valid values.");
-            return;
+        const productApi = new ProductControllerApi();
+        let productDto: ProductDto = {
+            name: formValues.productName,
+            description: formValues.description,
+            quantity: formValues.quantity,
+            units: formValues.units,
+            price: formValues.price,
+            currency: formValues.currency,
+            shippingResponsibility: formValues.shippingFee,
+            // userId: session.userId,
         }
+        productApi.createProduct(productDto)
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            })
+
+        // Check for validation errors
+        // if (!formValues.productName || !formValues.description || !formValues.quantity || errors.quantity || errors.price) {
+        //     alert("Please fill in all required fields with valid values.");
+        //     return;
+        // }
 
         // Process validated form values
-        console.log("Form Submitted:", { ...formValues, quantityUnit, shippingFee });
+        // console.log("Form Submitted:", { ...formValues, quantityUnit, shippingFee });
 
-        alert("Product Added Successfully!");
+        // alert("Product Added Successfully!");
     };
 
     return (
@@ -87,13 +115,13 @@ const AddProduct: React.FC = () => {
                 sx={{
                     maxWidth: "600px",
                     margin: "0 auto",
-                    marginTop: { xs: 8, sm: 10, md: 12 },
+                    marginTop: {xs: 8, sm: 10, md: 12},
                     padding: 4,
                     boxShadow: 2,
                     borderRadius: 2,
                 }}
             >
-                <Typography variant="h4" sx={{ textAlign: "center", mb: 3 }}>
+                <Typography variant="h4" sx={{textAlign: "center", mb: 3}}>
                     Add Product
                 </Typography>
 
@@ -107,7 +135,7 @@ const AddProduct: React.FC = () => {
                         required
                         value={formValues.productName}
                         onChange={handleChange}
-                        sx={{ mb: 2 }}
+                        sx={{mb: 2}}
                     />
 
                     {/* Description */}
@@ -121,11 +149,11 @@ const AddProduct: React.FC = () => {
                         required
                         value={formValues.description}
                         onChange={handleChange}
-                        sx={{ mb: 2 }}
+                        sx={{mb: 2}}
                     />
 
                     {/* Quantity and Unit */}
-                    <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                    <Box sx={{display: "flex", gap: 2, mb: 2}}>
                         <TextField
                             name="quantity"
                             label="Quantity"
@@ -141,12 +169,12 @@ const AddProduct: React.FC = () => {
                         <FormControl fullWidth>
                             <InputLabel>Unit</InputLabel>
                             <Select
-                                value={quantityUnit}
-                                onChange={handleUnitChange}
+                                name="units"
+                                value={formValues.units}
                                 label="Unit"
                                 required
                             >
-                                <MenuItem value="kg">Kg</MenuItem>
+                                <MenuItem value={ProductDtoUnitsEnum.Kg}>Kg</MenuItem>
                                 <MenuItem value="pcs">Pcs</MenuItem>
                                 <MenuItem value="liters">Liters</MenuItem>
                             </Select>
@@ -154,7 +182,7 @@ const AddProduct: React.FC = () => {
                     </Box>
 
                     {/* Price and Currency */}
-                    <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                    <Box sx={{display: "flex", gap: 2, mb: 2}}>
                         <TextField
                             name="price"
                             label="Price (Per Unit)"
@@ -172,37 +200,37 @@ const AddProduct: React.FC = () => {
                             <Select
                                 name="currency"
                                 value={formValues.currency}
-                                onChange={(e: React.ChangeEvent<{ value: unknown }>) =>
-                                    setFormValues({
-                                        ...formValues,
-                                        currency: e.target.value as string,
-                                    })
-                                }
+                                // onChange={(e: React.ChangeEvent<{ value: unknown }>) =>
+                                //     setFormValues({
+                                //         ...formValues,
+                                //         currency: e.target.value as string,
+                                //     })
+                                // }
                                 label="Currency"
                             >
                                 <MenuItem value="USD">USD</MenuItem>
                                 <MenuItem value="EUR">EUR</MenuItem>
                                 <MenuItem value="GBP">GBP</MenuItem>
-                                <MenuItem value="GBP">BGN</MenuItem>
+                                <MenuItem value={ProductDtoCurrencyEnum.Bgn}>BGN</MenuItem>
                             </Select>
                         </FormControl>
                     </Box>
 
                     {/* Shipping Fee Responsibility */}
-                    <Box sx={{ textAlign: "center", mb: 3 }}>
-                        <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                    <Box sx={{textAlign: "center", mb: 3}}>
+                        <Typography variant="subtitle1" sx={{mb: 1}}>
                             Who Pays for Shipping Fee?
                         </Typography>
                         <ToggleButtonGroup
-                            value={shippingFee}
+                            value={formValues.shippingFee}
                             exclusive
-                            onChange={handleShippingToggle}
+                            // onChange={handleShippingToggle}
                             aria-label="shipping fee responsibility"
                         >
-                            <ToggleButton value="seller" aria-label="seller">
+                            <ToggleButton value={ProductDtoShippingResponsibilityEnum.Seller} aria-label="seller">
                                 Seller
                             </ToggleButton>
-                            <ToggleButton value="buyer" aria-label="buyer">
+                            <ToggleButton value={ProductDtoShippingResponsibilityEnum.Buyer} aria-label="buyer">
                                 Buyer
                             </ToggleButton>
                         </ToggleButtonGroup>
@@ -214,7 +242,7 @@ const AddProduct: React.FC = () => {
                         variant="contained"
                         color="primary"
                         fullWidth
-                        sx={{ mt: 2 }}
+                        sx={{mt: 2}}
                     >
                         Add Product
                     </Button>

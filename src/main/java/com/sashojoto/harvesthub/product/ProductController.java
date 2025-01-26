@@ -19,7 +19,7 @@ public class ProductController {
     }
 
     @PostMapping("/api/product/create")
-    public ProductDto createUser(@RequestBody ProductDto productDto) {
+    public ProductDto createProduct(@RequestBody ProductDto productDto) {
         Product product = mapper.toProduct(productDto);
         User user = userService.getUser(productDto.getUserId());
         product.setOwner(user);
