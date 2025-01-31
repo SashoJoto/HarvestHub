@@ -1,10 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Button, Box, Avatar, Card } from "@mui/material";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Product from "../components/Product";
+import axios from "axios";
+
+// Define the structure of a product
+interface Product {
+    id: number;
+    title: string;
+    location: string;
+    price: number;
+    date: string;
+    user: {
+        name: string;
+        avatar: string;
+    };
+    image: string;
+}
 
 const Profile: React.FC = () => {
+    // State to manage product list
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Fetch products when the component loads
+    useEffect(() => {
+        const fetchUserProducts = async () => {
+            try {
+                const response = await axios.get("/api/products/user", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with proper token storage
+                    },
+                });
+                setProducts(response.data);
+            } catch (error) {
+                console.error("Error fetching user products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserProducts();
+    }, []);
+
     return (
         <>
             {/* Navbar */}
@@ -182,40 +221,39 @@ const Profile: React.FC = () => {
                 >
                     Your Products
                 </Typography>
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
-                    }}
-                >
-                    <Link to="/product" style={{ textDecoration: "none" }}>
-                        <Product
-                            image="https://via.placeholder.com/100"
-                            title="Product 1"
-                            user={{
-                                name: "John Doe",
-                                avatar: "https://via.placeholder.com/50",
-                            }}
-                            location="New York, USA"
-                            date="2023-10-21"
-                            price={99.99}
-                        />
-                    </Link>
-                    <Link to="/product" style={{ textDecoration: "none" }}>
-                        <Product
-                            image="https://via.placeholder.com/100"
-                            title="Product 2"
-                            user={{
-                                name: "Sarah Connor",
-                                avatar: "https://via.placeholder.com/50",
-                            }}
-                            location="Los Angeles, USA"
-                            date="2023-10-20"
-                            price={150}
-                        />
-                    </Link>
-                </Box>
+                {loading ? (
+                    <Typography>Loading products...</Typography>
+                ) : products.length === 0 ? (
+                    <Typography>No products to display.</Typography>
+                ) : (
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                        }}
+                    >
+                        {products.map((product) => (
+                            <Link
+                                to={`/product/${product.id}`} // Dynamic link to product page
+                                key={product.id}
+                                style={{ textDecoration: "none" }}
+                            >
+                                <Product
+                                    image={product.image}
+                                    title={product.title}
+                                    user={{
+                                        name: product.user.name,
+                                        avatar: product.user.avatar,
+                                    }}
+                                    location={product.location}
+                                    date={product.date}
+                                    price={product.price}
+                                />
+                            </Link>
+                        ))}
+                    </Box>
+                )}
             </Box>
         </>
     );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     Box,
     Typography,
@@ -7,27 +7,42 @@ import {
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import MessageIcon from "@mui/icons-material/Message";
-import Navbar from "../components/Navbar"; // Assuming you have Navbar component
-import Slider from "react-slick"; // Import the slider
-import "slick-carousel/slick/slick.css"; // Import slick-carousel styles
+import Navbar from "../components/Navbar";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import raw_milk from "../assets/raw_milk.jpg";
-import raw_milk_2 from "../assets/raw_milk_2.jpg";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+
+interface Product {
+    title: string;
+    images: string[];
+    price: number;
+    description: string;
+    sellerContact: string;
+}
 
 const ProductPage: React.FC = () => {
-    const product = {
-        title: "Raw milk",
-        images: [
-            raw_milk,
-            raw_milk_2,
-        ],
-        price: 199.99,
-        description:
-            "This amazing product comes with unparalleled quality and unique features. Perfect for anyone looking for excellence and performance. Don't miss your chance to own this spectacular item!",
-        sellerContact: "john.doe@example.com",
-    };
+    const { id } = useParams<{ id: string }>(); // Fetch the ID from the URL
+    const [product, setProduct] = useState<Product | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Slider settings for react-slick
+    useEffect(() => {
+        const fetchProductDetails = async () => {
+            try {
+                const response = await axios.get(`/api/product/${id}`);
+                setProduct(response.data);
+            } catch (error) {
+                console.error("Error fetching product details:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProductDetails();
+    }, [id]);
+
+    // Slider settings
     const sliderSettings = {
         dots: true,
         infinite: true,
@@ -39,6 +54,14 @@ const ProductPage: React.FC = () => {
         autoplaySpeed: 3000,
         pauseOnHover: true,
     };
+
+    if (loading) {
+        return <Typography>Loading product...</Typography>;
+    }
+
+    if (!product) {
+        return <Typography>Product not found.</Typography>;
+    }
 
     return (
         <>
@@ -69,7 +92,7 @@ const ProductPage: React.FC = () => {
                                     alt={`Product Image ${index + 1}`}
                                     style={{
                                         width: "100%",
-                                        maxWidth: "800px", // Limits slider image width within the container
+                                        maxWidth: "800px",
                                         height: "auto",
                                         margin: "0 auto",
                                         borderRadius: "5px",

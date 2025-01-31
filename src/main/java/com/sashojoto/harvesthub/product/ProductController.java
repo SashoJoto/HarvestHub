@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class ProductController {
@@ -30,4 +32,15 @@ public class ProductController {
         return mapper.toDto(productCreated);
     }
 
+    // New endpoint to fetch all products
+    @GetMapping("/api/products")
+    public List<ProductDto> getAllProducts() {
+        // Get all products from the service layer
+        List<Product> products = productService.getAllProducts();
+
+        // Map products to DTOs
+        return products.stream()
+                .map(mapper::toDto)
+                .toList();
+    }
 }
