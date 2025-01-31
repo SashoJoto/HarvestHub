@@ -1,5 +1,6 @@
 import axios, {AxiosInstance, InternalAxiosRequestConfig} from "axios";
 import {BASE_PATH} from "../api/base.ts";
+import {useNavigate} from "react-router-dom";
 
 // Create an Axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -21,6 +22,8 @@ apiClient.interceptors.request.use(
         return config; // Return the modified config
     },
     (error) => {
+        const navigate = useNavigate();
+        navigate("/login");
         // Handle request error
         return Promise.reject(error);
     }

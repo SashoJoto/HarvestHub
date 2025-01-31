@@ -1,34 +1,40 @@
-import React, { useEffect, useState } from "react";
-import {
-    Box,
-    Typography,
-    IconButton,
-    Button,
-} from "@mui/material";
+import React, {useEffect, useState} from "react";
+import {Box, IconButton, Typography,} from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import MessageIcon from "@mui/icons-material/Message";
 import Navbar from "../components/Navbar";
-import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
+import {ProductControllerApi, ProductDto} from "../api";
 
-interface Product {
-    title: string;
-    images: string[];
-    price: number;
-    description: string;
-    sellerContact: string;
-}
-
+// interface Product {
+//     title: string;
+//     images: string[];
+//     price: number;
+//     description: string;
+//     sellerContact: string;
+// }
+//
 const ProductPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>(); // Fetch the ID from the URL
-    const [product, setProduct] = useState<Product | null>(null);
+    const {id} = useParams<{ id: string }>(); // Fetch the ID from the URL
+    let [product, setProduct] = useState<ProductDto | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchProductDetails = async () => {
+            const productController: ProductControllerApi = new ProductControllerApi();
+            productController.getProduct(parseInt(id!))
+                .then(response => {
+                    product = response.data;
+                })
+                .catch(error => {
+                    const navigate = useNavigate();
+                    navigate("/login");
+                    alert("Error fetching product details: " + error.message);
+                })
+
+
             try {
                 const response = await axios.get(`/api/product/${id}`);
                 setProduct(response.data);
@@ -43,17 +49,17 @@ const ProductPage: React.FC = () => {
     }, [id]);
 
     // Slider settings
-    const sliderSettings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: true,
-        autoplay: true,
-        autoplaySpeed: 3000,
-        pauseOnHover: true,
-    };
+    // const sliderSettings = {
+    //     dots: true,
+    //     infinite: true,
+    //     speed: 500,
+    //     slidesToShow: 1,
+    //     slidesToScroll: 1,
+    //     arrows: true,
+    //     autoplay: true,
+    //     autoplaySpeed: 3000,
+    //     pauseOnHover: true,
+    // };
 
     if (loading) {
         return <Typography>Loading product...</Typography>;
@@ -66,10 +72,10 @@ const ProductPage: React.FC = () => {
     return (
         <>
             {/* Navbar */}
-            <Navbar />
+            <Navbar/>
 
             {/* Page Content */}
-            <Box sx={{ padding: { xs: 2, sm: 4, md: 6 }, maxWidth: "1200px", margin: "0 auto" }}>
+            <Box sx={{padding: {xs: 2, sm: 4, md: 6}, maxWidth: "1200px", margin: "0 auto"}}>
                 {/* Title */}
                 <Typography
                     variant="h3"
@@ -79,36 +85,36 @@ const ProductPage: React.FC = () => {
                         textAlign: "center",
                     }}
                 >
-                    {product.title}
+                    {product.name}
                 </Typography>
 
                 {/* Image Slider */}
-                <Box sx={{ marginBottom: 4 }}>
-                    <Slider {...sliderSettings}>
-                        {product.images.map((src, index) => (
-                            <div key={index}>
-                                <img
-                                    src={src}
-                                    alt={`Product Image ${index + 1}`}
-                                    style={{
-                                        width: "100%",
-                                        maxWidth: "800px",
-                                        height: "auto",
-                                        margin: "0 auto",
-                                        borderRadius: "5px",
-                                        boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-                                    }}
-                                />
-                            </div>
-                        ))}
-                    </Slider>
-                </Box>
+                {/*<Box sx={{ marginBottom: 4 }}>*/}
+                {/*    <Slider {...sliderSettings}>*/}
+                {/*        {product.images.map((src, index) => (*/}
+                {/*            <div key={index}>*/}
+                {/*                <img*/}
+                {/*                    src={src}*/}
+                {/*                    alt={`Product Image ${index + 1}`}*/}
+                {/*                    style={{*/}
+                {/*                        width: "100%",*/}
+                {/*                        maxWidth: "800px",*/}
+                {/*                        height: "auto",*/}
+                {/*                        margin: "0 auto",*/}
+                {/*                        borderRadius: "5px",*/}
+                {/*                        boxShadow: "0 2px 5px rgba(0,0,0,0.2)",*/}
+                {/*                    }}*/}
+                {/*                />*/}
+                {/*            </div>*/}
+                {/*        ))}*/}
+                {/*    </Slider>*/}
+                {/*</Box>*/}
 
                 {/* Price, Favorites, and Message Buttons */}
                 <Box
                     sx={{
                         display: "flex",
-                        flexDirection: { xs: "column", sm: "row" },
+                        flexDirection: {xs: "column", sm: "row"},
                         justifyContent: "space-between",
                         alignItems: "center",
                         gap: 2,
@@ -123,7 +129,7 @@ const ProductPage: React.FC = () => {
                             color: "white",
                         }}
                     >
-                        ${product.price.toFixed(2)}
+                        ${product.price!.toFixed(2)}
                     </Typography>
 
                     {/* Add to Favorites Button */}
@@ -135,19 +141,19 @@ const ProductPage: React.FC = () => {
                             fontSize: "1.5rem",
                         }}
                     >
-                        <FavoriteBorderIcon fontSize="inherit" />
+                        <FavoriteBorderIcon fontSize="inherit"/>
                     </IconButton>
 
                     {/* Message Button */}
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        startIcon={<MessageIcon />}
-                        onClick={() => alert(`Message sent to seller: ${product.sellerContact}`)}
-                    >
-                        Message Seller
-                    </Button>
+                    {/*<Button*/}
+                    {/*    variant="contained"*/}
+                    {/*    color="primary"*/}
+                    {/*    size="large"*/}
+                    {/*    startIcon={<MessageIcon />}*/}
+                    {/*    onClick={() => alert(`Message sent to seller: ${product.sellerContact}`)}*/}
+                    {/*>*/}
+                    {/*    Message Seller*/}
+                    {/*</Button>*/}
                 </Box>
 
                 {/* Description */}

@@ -2,30 +2,30 @@ import React from "react";
 import {
     Box,
     Typography,
-    Avatar,
+    // Avatar,
     IconButton,
-    ButtonBase,
+    // ButtonBase,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"; // Heart icon
 
 interface ProductProps {
-    image: string;
+    // image: string;
     title: string;
-    user: {
-        name: string;
-        avatar: string;
-    };
-    location: string;
-    date: string;
-    price: string | number;
+    // user: {
+    //     name: string;
+    //     avatar: string;
+    // };
+    // location: string;
+    // date: string;
+    price: number | undefined;
 }
 
 const Product: React.FC<ProductProps> = ({
-                                             image,
+                                             // image,
                                              title,
-                                             user,
-                                             location,
-                                             date,
+                                             // user,
+                                             // location,
+                                             // date,
                                              price,
                                          }) => {
     return (
@@ -48,20 +48,20 @@ const Product: React.FC<ProductProps> = ({
             }}
         >
             {/* Left Section: Product Image */}
-            <Box>
-                <ButtonBase>
-                    <img
-                        src={image}
-                        alt={title}
-                        style={{
-                            width: "150px",
-                            height: "150px",
-                            borderRadius: "4px",
-                            objectFit: "cover",
-                        }}
-                    />
-                </ButtonBase>
-            </Box>
+            {/*<Box>*/}
+            {/*    <ButtonBase>*/}
+            {/*        <img*/}
+            {/*            src={image}*/}
+            {/*            alt={title}*/}
+            {/*            style={{*/}
+            {/*                width: "150px",*/}
+            {/*                height: "150px",*/}
+            {/*                borderRadius: "4px",*/}
+            {/*                objectFit: "cover",*/}
+            {/*            }}*/}
+            {/*        />*/}
+            {/*    </ButtonBase>*/}
+            {/*</Box>*/}
 
             {/* Center Section: Product Info */}
             <Box
@@ -82,12 +82,12 @@ const Product: React.FC<ProductProps> = ({
                 </Typography>
 
                 {/* Middle Section: User */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Avatar src={user.avatar} alt={user.name} sx={{ width: 30, height: 30 }} />
-                    <Typography variant="subtitle2" sx={{ color: "text.secondary" }}>
-                        {user.name}
-                    </Typography>
-                </Box>
+                {/*<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>*/}
+                {/*    <Avatar src={user.avatar} alt={user.name} sx={{ width: 30, height: 30 }} />*/}
+                {/*    <Typography variant="subtitle2" sx={{ color: "text.secondary" }}>*/}
+                {/*        {user.name}*/}
+                {/*    </Typography>*/}
+                {/*</Box>*/}
 
                 {/* Bottom Section: Location and Creation Date */}
                 <Box
@@ -98,12 +98,12 @@ const Product: React.FC<ProductProps> = ({
                         gap: 0.5, // Small space between location and date
                     }}
                 >
-                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                        {location}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                        {date}
-                    </Typography>
+                    {/*<Typography variant="body2" sx={{ color: "text.secondary" }}>*/}
+                    {/*    {location}*/}
+                    {/*</Typography>*/}
+                    {/*<Typography variant="body2" sx={{ color: "text.secondary" }}>*/}
+                    {/*    {date}*/}
+                    {/*</Typography>*/}
                 </Box>
             </Box>
 

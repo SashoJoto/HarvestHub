@@ -17,8 +17,9 @@ public class ProductController {
     private final UserService userService;
 
     @GetMapping("/api/product/{id}")
-    public Product getProduct(@PathVariable Long id) {
-        return null;
+    public ProductDto getProduct(@PathVariable Long id) {
+        Product product = productService.getProduct(id);
+        return mapper.toDto(product);
     }
 
     @PostMapping("/api/product/create")
@@ -34,9 +35,9 @@ public class ProductController {
 
     // New endpoint to fetch all products
     @GetMapping("/api/products")
-    public List<ProductDto> getAllProducts() {
-        // Get all products from the service layer
-        List<Product> products = productService.getAllProducts();
+    public List<ProductDto> getAllProducts(@AuthenticationPrincipal User principal) {
+        User user = userService.getUserByName(principal.getName());
+        List<Product> products = productService.getAllProducts(user);
 
         // Map products to DTOs
         return products.stream()

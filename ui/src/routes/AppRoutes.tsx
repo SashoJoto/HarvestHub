@@ -28,7 +28,7 @@ const AppRoutes: React.FC = () => {
                     <Route path="/chat" element={<ChatPage/>}/>
                     <Route path="/add-product" element={<AddProductPage/>}/>
                     <Route path="/profile" element={<ProfilePage/>}/>
-                    <Route path="/product" element={<ProductPage/>}/>
+                    <Route path="/product/:id" element={<ProductPage/>}/>
                     <Route path="*" element={<Navigate to="/" replace/>}/>
                 </Route>
             </Routes>

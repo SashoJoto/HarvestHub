@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Typography, Button, Box, Avatar, Card } from "@mui/material";
-import { Link } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {Typography, Button, Box, Avatar, Card} from "@mui/material";
+import {Link} from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Product from "../components/Product";
 import axios from "axios";
+import {ProductControllerApi, ProductDto} from "../api";
 
 // Define the structure of a product
 interface Product {
@@ -21,14 +22,25 @@ interface Product {
 
 const Profile: React.FC = () => {
     // State to manage product list
-    const [products, setProducts] = useState<Product[]>([]);
+    let [products, setProducts] = useState<ProductDto[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Fetch products when the component loads
     useEffect(() => {
+
+        const productController: ProductControllerApi = new ProductControllerApi();
+        productController.getAllProducts()
+            .then(response => {
+                products = response.data;
+            })
+            .catch(error => {
+                alert("Error fetching products: " + error.message);
+            })
+
+
         const fetchUserProducts = async () => {
             try {
-                const response = await axios.get("/api/products/user", {
+                const response = await axios.get("/api/products", {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with proper token storage
                     },
@@ -47,7 +59,7 @@ const Profile: React.FC = () => {
     return (
         <>
             {/* Navbar */}
-            <Navbar />
+            <Navbar/>
 
             {/* Profile Section */}
             <Box
@@ -68,10 +80,10 @@ const Profile: React.FC = () => {
                         width: "100%",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: { xs: "center", sm: "space-between" }, // Centered on mobile
+                        justifyContent: {xs: "center", sm: "space-between"}, // Centered on mobile
                         flexWrap: "wrap", // Ensure it wraps properly
                         gap: 3,
-                        flexDirection: { xs: "column", sm: "row" }, // Stack vertically on mobile
+                        flexDirection: {xs: "column", sm: "row"}, // Stack vertically on mobile
                     }}
                 >
                     {/* Profile Picture */}
@@ -79,11 +91,11 @@ const Profile: React.FC = () => {
                         alt="Profile Picture"
                         src="/path-to-profile-photo.jpg"
                         sx={{
-                            width: { xs: "120px", sm: "200px" }, // Adjust size for mobile larger
-                            height: { xs: "120px", sm: "200px" },
+                            width: {xs: "120px", sm: "200px"}, // Adjust size for mobile larger
+                            height: {xs: "120px", sm: "200px"},
                             border: "4px solid #ddd",
                             boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-                            marginBottom: { xs: 2, sm: 0 }, // Add space below image on mobile
+                            marginBottom: {xs: 2, sm: 0}, // Add space below image on mobile
                         }}
                     />
 
@@ -93,8 +105,8 @@ const Profile: React.FC = () => {
                             flexGrow: 1,
                             display: "flex",
                             flexDirection: "column",
-                            alignItems: { xs: "center", sm: "flex-start" }, // Center text on mobile
-                            textAlign: { xs: "center", sm: "left" }, // Center-align text for mobile
+                            alignItems: {xs: "center", sm: "flex-start"}, // Center text on mobile
+                            textAlign: {xs: "center", sm: "left"}, // Center-align text for mobile
                             gap: 1,
                         }}
                     >
@@ -102,7 +114,7 @@ const Profile: React.FC = () => {
                             variant="h4"
                             sx={{
                                 fontWeight: "bold",
-                                fontSize: { xs: "22px", sm: "28px" }, // Adjust text size
+                                fontSize: {xs: "22px", sm: "28px"}, // Adjust text size
                             }}
                         >
                             John Doe
@@ -110,7 +122,7 @@ const Profile: React.FC = () => {
                         <Typography
                             variant="body1"
                             sx={{
-                                fontSize: { xs: "16px", sm: "20px" }, // Adjust text size
+                                fontSize: {xs: "16px", sm: "20px"}, // Adjust text size
                                 wordBreak: "break-word", // Prevent text from overflowing
                             }}
                         >
@@ -119,7 +131,7 @@ const Profile: React.FC = () => {
                         <Typography
                             variant="body1"
                             sx={{
-                                fontSize: { xs: "16px", sm: "20px" },
+                                fontSize: {xs: "16px", sm: "20px"},
                                 wordBreak: "break-word",
                             }}
                         >
@@ -128,7 +140,7 @@ const Profile: React.FC = () => {
                         <Typography
                             variant="body1"
                             sx={{
-                                fontSize: { xs: "16px", sm: "20px" },
+                                fontSize: {xs: "16px", sm: "20px"},
                                 wordBreak: "break-word",
                             }}
                         >
@@ -143,7 +155,7 @@ const Profile: React.FC = () => {
                             flexDirection: "column",
                             alignItems: "center", // Center align on mobile
                             gap: 2,
-                            width: { xs: "100%", sm: "auto" }, // Full width on mobile
+                            width: {xs: "100%", sm: "auto"}, // Full width on mobile
                         }}
                     >
                         <Button
@@ -151,7 +163,7 @@ const Profile: React.FC = () => {
                             color="primary"
                             fullWidth={false}
                             sx={{
-                                width: { xs: "100%", sm: "150px" }, // Full-width buttons on mobile
+                                width: {xs: "100%", sm: "150px"}, // Full-width buttons on mobile
                             }}
                             onClick={() => alert("Edit Profile Clicked")}
                         >
@@ -161,7 +173,7 @@ const Profile: React.FC = () => {
                             variant="contained"
                             color="secondary"
                             sx={{
-                                width: { xs: "100%", sm: "150px" }, // Full-width buttons on mobile
+                                width: {xs: "100%", sm: "150px"}, // Full-width buttons on mobile
                             }}
                             onClick={() => alert("Settings Clicked")}
                         >
@@ -217,7 +229,7 @@ const Profile: React.FC = () => {
             >
                 <Typography
                     variant="h6"
-                    sx={{ fontWeight: "bold", mb: 2, textAlign: "center" }}
+                    sx={{fontWeight: "bold", mb: 2, textAlign: "center"}}
                 >
                     Your Products
                 </Typography>
@@ -237,17 +249,17 @@ const Profile: React.FC = () => {
                             <Link
                                 to={`/product/${product.id}`} // Dynamic link to product page
                                 key={product.id}
-                                style={{ textDecoration: "none" }}
+                                style={{textDecoration: "none"}}
                             >
                                 <Product
-                                    image={product.image}
-                                    title={product.title}
-                                    user={{
-                                        name: product.user.name,
-                                        avatar: product.user.avatar,
-                                    }}
-                                    location={product.location}
-                                    date={product.date}
+                                    // image={product.image}
+                                    title={product.name!}
+                                    // user={{
+                                    //     name: product.user.name,
+                                    //     avatar: product.user.avatar,
+                                    // }}
+                                    // location={product.location}
+                                    // date={product.date}
                                     price={product.price}
                                 />
                             </Link>

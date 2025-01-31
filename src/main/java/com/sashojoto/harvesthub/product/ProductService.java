@@ -1,5 +1,6 @@
 package com.sashojoto.harvesthub.product;
 
+import com.sashojoto.harvesthub.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,11 @@ public class ProductService {
         return createdProduct;
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<Product> getAllProducts(User user) {
+        return productRepository.findByOwnerId(user.getId());
+    }
+
+    public Product getProduct(Long id) {
+        return productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Product not found"));
     }
 }
