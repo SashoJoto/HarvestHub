@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 // import MenuIcon from "@mui/icons-material/Menu";
 import Navbar from "../components/Navbar";
-import {Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {AuthControllerApi, LoginRequest} from "../api"; // Assuming you have a Navbar component.
 
 // Login Page Component
@@ -26,7 +26,8 @@ const LoginPage: React.FC = () => {
     };
 
     // Simulate login action
-    const handleLogin = () => {
+    const login = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         const authentication: AuthControllerApi = new AuthControllerApi();
         let loginRequest: LoginRequest = {
             username: credentials.email,
@@ -55,73 +56,73 @@ const LoginPage: React.FC = () => {
 
             {/* Restricted Area - Show Login Form if Not Logged In */}
             {!isLoggedIn ? (
-                // Login Form
-                <Box
-                    sx={{
-                        height: "calc(100vh - 64px)", // Adjust for navbar height
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        flexDirection: "column",
-                        padding: 2,
-                    }}
-                >
-                    {/* Heading */}
-                    <Typography
-                        variant="h4"
-                        sx={{
-                            mb: 3,
-                            fontWeight: "bold",
-                            textAlign: "center",
-                        }}
-                    >
-                        Log In to Access the Platform
-                    </Typography>
-
-                    {/* Login Form */}
                     <Box
-                        component="form"
                         sx={{
-                            width: "90%",
-                            maxWidth: "400px",
+                            height: "calc(100vh - 64px)", // Adjust for navbar height
                             display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                             flexDirection: "column",
-                            gap: 2,
+                            padding: 2,
                         }}
                     >
-                        {/* Email Input */}
-                        <TextField
-                            label="Email"
-                            name="email"
-                            type="email"
-                            value={credentials.email}
-                            onChange={handleChange}
-                            fullWidth
-                            required
-                        />
-
-                        {/* Password Input */}
-                        <TextField
-                            label="Password"
-                            name="password"
-                            type="password"
-                            value={credentials.password}
-                            onChange={handleChange}
-                            fullWidth
-                            required
-                        />
-
-                        {/* Login Button */}
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            fullWidth
-                            onClick={handleLogin}
+                        {/* Heading */}
+                        <Typography
+                            variant="h4"
+                            sx={{
+                                mb: 3,
+                                fontWeight: "bold",
+                                textAlign: "center",
+                            }}
                         >
-                            Log In
-                        </Button>
+                            Log In to Access the Platform
+                        </Typography>
+
+                        {/* Login Form */}
+                        <Box
+                            component="form"
+                            onSubmit={login}
+                            sx={{
+                                width: "90%",
+                                maxWidth: "400px",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 2,
+                            }}
+                        >
+                            {/* Email Input */}
+                            <TextField
+                                label="Email"
+                                name="email"
+                                // type="email"
+                                value={credentials.email}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                            />
+
+                            {/* Password Input */}
+                            <TextField
+                                label="Password"
+                                name="password"
+                                type="password"
+                                value={credentials.password}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                            />
+
+                            {/* Login Button */}
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                                type="submit"
+                            >
+                                Log In
+                            </Button>
+                        </Box>
                     </Box>
-                </Box>
             ) : (
                 // Display Protected Content (After Login)
                 <Box
