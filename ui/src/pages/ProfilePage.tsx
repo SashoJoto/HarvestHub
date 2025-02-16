@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Typography, Button, Box, Avatar, Card} from "@mui/material";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Product from "../components/Product";
 import axios from "axios";
@@ -21,13 +21,18 @@ interface Product {
 }
 
 const Profile: React.FC = () => {
+    const navigate = useNavigate();
     // State to manage product list
     let [products, setProducts] = useState<ProductDto[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const logout = () => {
+        localStorage.removeItem("jwtToken"); // Clear token from storage
+        navigate("/login"); // Redirect to login page
+    };
+
     // Fetch products when the component loads
     useEffect(() => {
-
         const productController: ProductControllerApi = new ProductControllerApi();
         productController.getAllProducts()
             .then(response => {
@@ -175,9 +180,9 @@ const Profile: React.FC = () => {
                             sx={{
                                 width: {xs: "100%", sm: "150px"}, // Full-width buttons on mobile
                             }}
-                            onClick={() => alert("Settings Clicked")}
+                            onClick={logout}
                         >
-                            Settings
+                            Logout
                         </Button>
                     </Box>
                 </Box>
