@@ -25,7 +25,7 @@ public class ProductController {
     @PostMapping("/api/product/create")
     public ProductDto createProduct(@RequestBody ProductDto productDto, @AuthenticationPrincipal User principal) {
         Product product = mapper.toProduct(productDto);
-        User user = userService.getUserByName(principal.getName());
+        User user = userService.getUserByName(principal.getUsername());
         product.setOwner(user);
 
         Product productCreated = productService.createProduct(product);
@@ -36,7 +36,7 @@ public class ProductController {
     // New endpoint to fetch all products
     @GetMapping("/api/products")
     public List<ProductDto> getAllProducts(@AuthenticationPrincipal User principal) {
-        User user = userService.getUserByName(principal.getName());
+        User user = userService.getUserByName(principal.getUsername());
         List<Product> products = productService.getAllProducts(user);
 
         // Map products to DTOs

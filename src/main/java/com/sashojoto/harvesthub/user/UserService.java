@@ -1,10 +1,8 @@
 package com.sashojoto.harvesthub.user;
 
 import com.sashojoto.harvesthub.exceptions.HarvestHubException;
-import com.sashojoto.harvesthub.security.AuthController;
 import com.sashojoto.harvesthub.security.AuthController.LoginRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,11 +24,11 @@ public class UserService {
     }
 
     public boolean login(LoginRequest loginRequest) {
-        List<User> users = userRepository.findByNameAndPassword(loginRequest.getUsername(), loginRequest.getPassword());
+        List<User> users = userRepository.findByUsernameAndPassword(loginRequest.getUsername(), loginRequest.getPassword());
         return users.size() == 1;
     }
 
     public User getUserByName(String name) {
-        return userRepository.findByName(name);
+        return userRepository.findByUsername(name);
     }
 }

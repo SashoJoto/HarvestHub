@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Box, TextField, Button, Typography } from "@mui/material";
+import React, {useState, useEffect, useRef} from "react";
+import {Box, TextField, Button, Typography} from "@mui/material";
 import Navbar from "../components/Navbar";
-import { AuthControllerApi, RegisterRequest } from "../api";
-import { useNavigate } from "react-router-dom";
+import {User, UserControllerApi} from "../api";
+import {useNavigate} from "react-router-dom";
 
 const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
@@ -22,14 +22,14 @@ const RegisterPage: React.FC = () => {
 
     // Handle form input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setFormData((prev) => ({...prev, [name]: value}));
     };
 
     // Handle registration form submission
     const register = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault(); // Prevent page reload
-        const { username, email, password, confirmPassword } = formData;
+        const {username, email, password, confirmPassword} = formData;
 
         // Basic validation
         if (!username || !email || !password || !confirmPassword) {
@@ -42,15 +42,15 @@ const RegisterPage: React.FC = () => {
         }
 
         // API call to register
-        const authController = new AuthControllerApi();
-        const registerRequest: RegisterRequest = {
+        const userController = new UserControllerApi();
+        const user: User = {
             username: username,
             email: email,
             password: password,
         };
 
-        authController
-            .register(registerRequest)
+        userController
+            .createUser(user)
             .then((response) => {
                 if (response.status === 200) {
                     setIsRegistered(true);
@@ -66,7 +66,7 @@ const RegisterPage: React.FC = () => {
     return (
         <>
             {/* Navbar */}
-            <Navbar />
+            <Navbar/>
 
             {/* Show Registration Form if Not Registered Yet */}
             {!isRegistered ? (
@@ -174,7 +174,7 @@ const RegisterPage: React.FC = () => {
                                 href="/login"
                                 variant="text"
                                 size="small"
-                                sx={{ padding: 0 }}
+                                sx={{padding: 0}}
                             >
                                 Log In
                             </Button>
@@ -185,7 +185,7 @@ const RegisterPage: React.FC = () => {
                 // Show Success Message After Registration
                 <Box
                     sx={{
-                        padding: { xs: 2, sm: 4 },
+                        padding: {xs: 2, sm: 4},
                         maxWidth: "800px",
                         margin: "0 auto",
                         textAlign: "center",
@@ -193,13 +193,13 @@ const RegisterPage: React.FC = () => {
                 >
                     <Typography
                         variant="h5"
-                        sx={{ fontWeight: "bold", marginTop: 3 }}
+                        sx={{fontWeight: "bold", marginTop: 3}}
                     >
                         Registration Successful!
                     </Typography>
                     <Typography
                         variant="body1"
-                        sx={{ marginTop: 2, color: "text.secondary" }}
+                        sx={{marginTop: 2, color: "text.secondary"}}
                     >
                         Your account has been created. You can now log in to access the platform.
                     </Typography>
