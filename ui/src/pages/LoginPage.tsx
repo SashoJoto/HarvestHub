@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {
     Box,
     TextField,
@@ -17,9 +17,15 @@ import {AuthControllerApi, LoginRequest} from "../api"; // Assuming you have a N
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login state
-    const [credentials, setCredentials] = useState({email: "", password: ""}); // Form state.
+    const [credentials, setCredentials] = useState({email: "", password: ""});
 
-    // Handle form value changes
+    const emailInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        emailInputRef.current?.focus(); // Focus on the email input
+    }, []);
+
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
         setCredentials((prev) => ({...prev, [name]: value}));
@@ -95,6 +101,7 @@ const LoginPage: React.FC = () => {
                                 label="Email"
                                 name="email"
                                 // type="email"
+                                inputRef={emailInputRef}
                                 value={credentials.email}
                                 onChange={handleChange}
                                 fullWidth
@@ -121,6 +128,25 @@ const LoginPage: React.FC = () => {
                             >
                                 Log In
                             </Button>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    textAlign: "center",
+                                    mt: 2,
+                                    color: "text.secondary",
+                                }}
+                            >
+                                Don't have an account?{" "}
+                                <Button
+                                    component="a"
+                                    href="/register"
+                                    variant="text"
+                                    size="small"
+                                    sx={{ padding: 0 }}
+                                >
+                                    Register
+                                </Button>
+                            </Typography>
                         </Box>
                     </Box>
             ) : (
