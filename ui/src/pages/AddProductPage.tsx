@@ -14,7 +14,7 @@ import {
 import Navbar from "../components/Navbar.tsx";
 import {
     ProductControllerApi,
-    ProductDto,
+    ProductDto, ProductDtoCategoryEnum,
     ProductDtoCurrencyEnum,
     ProductDtoShippingResponsibilityEnum,
     ProductDtoUnitsEnum
@@ -34,12 +34,14 @@ const AddProduct: React.FC = () => {
         units: ProductDtoUnitsEnum.Kg,
         price: 0,
         currency: ProductDtoCurrencyEnum.Bgn,
-        shippingFee: ProductDtoShippingResponsibilityEnum.Buyer
+        shippingFee: ProductDtoShippingResponsibilityEnum.Buyer,
+        category: ProductDtoCategoryEnum.BakeryProducts,
     });
 
     const [errors, setErrors] = useState({
         quantity: false,
         price: false,
+        category: false,
     });
 
     // Handle input changes
@@ -68,7 +70,7 @@ const AddProduct: React.FC = () => {
             price: formValues.price,
             currency: formValues.currency,
             shippingResponsibility: formValues.shippingFee,
-            // userId: session.userId,
+            category: formValues.category
         }
         const productApi = new ProductControllerApi();
         productApi.createProduct(productDto)
@@ -109,6 +111,20 @@ const AddProduct: React.FC = () => {
                 </Typography>
 
                 <form onSubmit={handleSubmit}>
+                    <Box sx={{display: "flex", gap: 2, mb: 2}}>
+                        <FormControl fullWidth>
+                            <InputLabel>Category</InputLabel>
+                            <Select
+                                name="category"
+                                required
+                                value={formValues.category}
+                                onChange={handleChange}
+                                label="Category"
+                            >
+                                <MenuItem value={ProductDtoCategoryEnum.BakeryProducts}>Bakery Products</MenuItem>
+                                <MenuItem value={ProductDtoCategoryEnum.DairyProducts}>Dairy Products</MenuItem>
+                            </Select>
+                        </FormControl>                    </Box>
                     {/* Product Name */}
                     <TextField
                         name="productName"
@@ -207,7 +223,11 @@ const AddProduct: React.FC = () => {
                         <ToggleButtonGroup
                             value={formValues.shippingFee}
                             exclusive
-                            // onChange={handleShippingToggle}
+                            onChange={(event, value) => {
+                                if (value !== null) {
+                                    setFormValues({...formValues, shippingFee: value});
+                                }
+                            }}
                             aria-label="shipping fee responsibility"
                         >
                             <ToggleButton value={ProductDtoShippingResponsibilityEnum.Seller} aria-label="seller">
