@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
     Box,
     TextField,
@@ -10,23 +10,19 @@ import {
     ToggleButtonGroup,
     ToggleButton,
     Typography,
+    Snackbar,
+    Alert,
 } from "@mui/material";
 import Navbar from "../components/Navbar.tsx";
 import {
     ProductControllerApi,
-    ProductDto, ProductDtoCategoryEnum,
+    ProductDto,
     ProductDtoCurrencyEnum,
     ProductDtoShippingResponsibilityEnum,
-    ProductDtoUnitsEnum
+    ProductDtoUnitsEnum,
 } from "../api";
 
-//Add image uploading
-//Fix UI
-
-
 const AddProduct: React.FC = () => {
-    // const [shippingFee, setShippingFee] = useState("seller");
-    // const [quantityUnit, setQuantityUnit] = useState("");
     const [formValues, setFormValues] = useState({
         productName: "",
         description: "",
@@ -35,18 +31,25 @@ const AddProduct: React.FC = () => {
         price: 0,
         currency: ProductDtoCurrencyEnum.Bgn,
         shippingFee: ProductDtoShippingResponsibilityEnum.Buyer,
-        category: ProductDtoCategoryEnum.BakeryProducts,
     });
 
     const [errors, setErrors] = useState({
         quantity: false,
         price: false,
-        category: false,
     });
 
+    // Snackbar state
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+        "success"
+    );
+
     // Handle input changes
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {name, value} = e.target;
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | any>
+    ) => {
+        const { name, value } = e.target;
         setFormValues({
             ...formValues,
             [name]: value,
@@ -60,6 +63,11 @@ const AddProduct: React.FC = () => {
         }
     };
 
+    // Snackbar handlers
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         let productDto: ProductDto = {
@@ -70,61 +78,45 @@ const AddProduct: React.FC = () => {
             price: formValues.price,
             currency: formValues.currency,
             shippingResponsibility: formValues.shippingFee,
-            category: formValues.category
-        }
+        };
+
         const productApi = new ProductControllerApi();
-        productApi.createProduct(productDto)
-            .then(response => {
+        productApi
+            .createProduct(productDto)
+            .then((response) => {
                 console.log(response.data);
+                setSnackbarMessage("Product added successfully!");
+                setSnackbarSeverity("success");
+                setSnackbarOpen(true); // Show success message
             })
-            .catch(error => {
+            .catch((error) => {
                 console.log(error);
-            })
+                setSnackbarMessage("Failed to add product. Please try again.");
+                setSnackbarSeverity("error");
+                setSnackbarOpen(true); // Show error message
+            });
 
-        // Check for validation errors
-        // if (!formValues.productName || !formValues.description || !formValues.quantity || errors.quantity || errors.price) {
-        //     alert("Please fill in all required fields with valid values.");
-        //     return;
-        // }
-
-        // Process validated form values
-        // console.log("Form Submitted:", { ...formValues, quantityUnit, shippingFee });
-
-        // alert("Product Added Successfully!");
+        // Additional validation can be added if necessary
     };
 
     return (
         <>
-            <Navbar/>
+            <Navbar />
             <Box
                 sx={{
                     maxWidth: "600px",
                     margin: "0 auto",
-                    marginTop: {xs: 8, sm: 10, md: 12},
+                    marginTop: { xs: 8, sm: 10, md: 12 },
                     padding: 4,
                     boxShadow: 2,
                     borderRadius: 2,
                 }}
             >
-                <Typography variant="h4" sx={{textAlign: "center", mb: 3}}>
+                <Typography variant="h4" sx={{ textAlign: "center", mb: 3 }}>
                     Add Product
                 </Typography>
 
                 <form onSubmit={handleSubmit}>
-                    <Box sx={{display: "flex", gap: 2, mb: 2}}>
-                        <FormControl fullWidth>
-                            <InputLabel>Category</InputLabel>
-                            <Select
-                                name="category"
-                                required
-                                value={formValues.category}
-                                onChange={handleChange}
-                                label="Category"
-                            >
-                                <MenuItem value={ProductDtoCategoryEnum.BakeryProducts}>Bakery Products</MenuItem>
-                                <MenuItem value={ProductDtoCategoryEnum.DairyProducts}>Dairy Products</MenuItem>
-                            </Select>
-                        </FormControl>                    </Box>
                     {/* Product Name */}
                     <TextField
                         name="productName"
@@ -134,7 +126,7 @@ const AddProduct: React.FC = () => {
                         required
                         value={formValues.productName}
                         onChange={handleChange}
-                        sx={{mb: 2}}
+                        sx={{ mb: 2 }}
                     />
 
                     {/* Description */}
@@ -148,11 +140,11 @@ const AddProduct: React.FC = () => {
                         required
                         value={formValues.description}
                         onChange={handleChange}
-                        sx={{mb: 2}}
+                        sx={{ mb: 2 }}
                     />
 
                     {/* Quantity and Unit */}
-                    <Box sx={{display: "flex", gap: 2, mb: 2}}>
+                    <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                         <TextField
                             name="quantity"
                             label="Quantity"
@@ -162,7 +154,9 @@ const AddProduct: React.FC = () => {
                             value={formValues.quantity}
                             onChange={handleChange}
                             error={errors.quantity}
-                            helperText={errors.quantity ? "Quantity must be a positive number" : ""}
+                            helperText={
+                                errors.quantity ? "Quantity must be a positive number" : ""
+                            }
                             fullWidth
                         />
                         <FormControl fullWidth>
@@ -170,6 +164,7 @@ const AddProduct: React.FC = () => {
                             <Select
                                 name="units"
                                 value={formValues.units}
+                                onChange={handleChange}
                                 label="Unit"
                                 required
                             >
@@ -181,7 +176,7 @@ const AddProduct: React.FC = () => {
                     </Box>
 
                     {/* Price and Currency */}
-                    <Box sx={{display: "flex", gap: 2, mb: 2}}>
+                    <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                         <TextField
                             name="price"
                             label="Price (Per Unit)"
@@ -191,7 +186,9 @@ const AddProduct: React.FC = () => {
                             value={formValues.price}
                             onChange={handleChange}
                             error={errors.price}
-                            helperText={errors.price ? "Price must be a positive number" : ""}
+                            helperText={
+                                errors.price ? "Price must be a positive number" : ""
+                            }
                             fullWidth
                         />
                         <FormControl fullWidth>
@@ -199,12 +196,7 @@ const AddProduct: React.FC = () => {
                             <Select
                                 name="currency"
                                 value={formValues.currency}
-                                // onChange={(e: React.ChangeEvent<{ value: unknown }>) =>
-                                //     setFormValues({
-                                //         ...formValues,
-                                //         currency: e.target.value as string,
-                                //     })
-                                // }
+                                onChange={handleChange}
                                 label="Currency"
                             >
                                 <MenuItem value={ProductDtoCurrencyEnum.Usd}>USD</MenuItem>
@@ -216,8 +208,8 @@ const AddProduct: React.FC = () => {
                     </Box>
 
                     {/* Shipping Fee Responsibility */}
-                    <Box sx={{textAlign: "center", mb: 3}}>
-                        <Typography variant="subtitle1" sx={{mb: 1}}>
+                    <Box sx={{ textAlign: "center", mb: 3 }}>
+                        <Typography variant="subtitle1" sx={{ mb: 1 }}>
                             Who Pays for Shipping Fee?
                         </Typography>
                         <ToggleButtonGroup
@@ -225,15 +217,21 @@ const AddProduct: React.FC = () => {
                             exclusive
                             onChange={(event, value) => {
                                 if (value !== null) {
-                                    setFormValues({...formValues, shippingFee: value});
+                                    setFormValues({ ...formValues, shippingFee: value });
                                 }
                             }}
                             aria-label="shipping fee responsibility"
                         >
-                            <ToggleButton value={ProductDtoShippingResponsibilityEnum.Seller} aria-label="seller">
+                            <ToggleButton
+                                value={ProductDtoShippingResponsibilityEnum.Seller}
+                                aria-label="seller"
+                            >
                                 Seller
                             </ToggleButton>
-                            <ToggleButton value={ProductDtoShippingResponsibilityEnum.Buyer} aria-label="buyer">
+                            <ToggleButton
+                                value={ProductDtoShippingResponsibilityEnum.Buyer}
+                                aria-label="buyer"
+                            >
                                 Buyer
                             </ToggleButton>
                         </ToggleButtonGroup>
@@ -245,12 +243,28 @@ const AddProduct: React.FC = () => {
                         variant="contained"
                         color="primary"
                         fullWidth
-                        sx={{mt: 2}}
+                        sx={{ mt: 2 }}
                     >
                         Add Product
                     </Button>
                 </form>
             </Box>
+
+            {/* Snackbar to show success or error messages */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={5000} // Automatically closes after 5 seconds
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={snackbarSeverity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 };
