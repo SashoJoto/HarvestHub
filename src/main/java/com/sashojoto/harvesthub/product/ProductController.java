@@ -3,9 +3,12 @@ package com.sashojoto.harvesthub.product;
 import com.sashojoto.harvesthub.user.User;
 import com.sashojoto.harvesthub.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -43,5 +46,25 @@ public class ProductController {
         return products.stream()
                 .map(mapper::toDto)
                 .toList();
+    }
+
+    @GetMapping("/api/products/search")
+    public List<ProductDto> searchProducts(@RequestParam String query) {
+        List<Product> products = productService.searchProducts(query);
+        return products.stream()
+                .map(mapper::toDto) // Map Product entities to DTOs
+                .toList();
+    }
+
+    @GetMapping("/products/by-category")
+    public ResponseEntity<List<ProductDto>> getProductsByCategory(@RequestParam String category) {
+        try {
+            // Fetch products based on category (map enums to your categories)
+            List<ProductDto> products = productService.getProductsByCategory(category);
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.emptyList());
+        }
     }
 }

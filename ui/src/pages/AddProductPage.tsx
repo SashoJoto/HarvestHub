@@ -17,7 +17,7 @@ import Navbar from "../components/Navbar.tsx";
 import {
     ProductControllerApi,
     ProductDto,
-    ProductDtoCurrencyEnum,
+    ProductDtoCurrencyEnum, ProductDtoCategoryEnum,
     ProductDtoShippingResponsibilityEnum,
     ProductDtoUnitsEnum,
 } from "../api";
@@ -31,11 +31,13 @@ const AddProduct: React.FC = () => {
         price: 0,
         currency: ProductDtoCurrencyEnum.Bgn,
         shippingFee: ProductDtoShippingResponsibilityEnum.Buyer,
+        category: ProductDtoCategoryEnum.DairyProducts,
     });
 
     const [errors, setErrors] = useState({
         quantity: false,
         price: false,
+        category: false,
     });
 
     // Snackbar state
@@ -78,6 +80,7 @@ const AddProduct: React.FC = () => {
             price: formValues.price,
             currency: formValues.currency,
             shippingResponsibility: formValues.shippingFee,
+            category: formValues.category,
         };
 
         const productApi = new ProductControllerApi();
@@ -117,6 +120,26 @@ const AddProduct: React.FC = () => {
                 </Typography>
 
                 <form onSubmit={handleSubmit}>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel>Category</InputLabel>
+                        <Select
+                            name="category"
+                            required
+                            value={formValues.category}
+                            onChange={handleChange}
+                            label="Category"
+                        >
+                            <MenuItem value={ProductDtoCategoryEnum.DairyProducts}>Dairy Products</MenuItem>
+                            <MenuItem value={ProductDtoCategoryEnum.MeatAndPoultryProducts}>Meat and Poultry Products</MenuItem>
+                            <MenuItem value={ProductDtoCategoryEnum.VegetableProducts}>Vegetable Products</MenuItem>
+                            <MenuItem value={ProductDtoCategoryEnum.EggsProducts}>Eggs Products</MenuItem>
+                            <MenuItem value={ProductDtoCategoryEnum.FruitProducts}>Fruit Products</MenuItem>
+                            <MenuItem value={ProductDtoCategoryEnum.HerbsAndSpicesProducts}>Herbs and Spices Products</MenuItem>
+                            <MenuItem value={ProductDtoCategoryEnum.HoneyAndSweetenersProducts}>Honey and Sweeteners Products</MenuItem>
+                            <MenuItem value={ProductDtoCategoryEnum.GrainsAndLegumesProducts}>Grains and Legumes Products</MenuItem>
+                            <MenuItem value={ProductDtoCategoryEnum.FlowersProducts}>Flowers Products</MenuItem>
+                        </Select>
+                    </FormControl>
                     {/* Product Name */}
                     <TextField
                         name="productName"
