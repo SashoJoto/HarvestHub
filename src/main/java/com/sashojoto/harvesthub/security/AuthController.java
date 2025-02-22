@@ -1,5 +1,6 @@
 package com.sashojoto.harvesthub.security;
 
+import com.sashojoto.harvesthub.user.User;
 import com.sashojoto.harvesthub.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +14,16 @@ public class AuthController {
     private final JwtTokenUtil jwtTokenUtil;
     private final UserService userService;
 
+    @GetMapping("/validate")
+    public ResponseEntity<Boolean> validateToken() {
+        return ResponseEntity.ok(Boolean.valueOf(true));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        if (userService.login(loginRequest)) {
-            String token = jwtTokenUtil.generateToken(loginRequest.getUsername());
+        User loggedinUser = userService.login(loginRequest);
+        if (loggedinUser != null) {
+            String token = jwtTokenUtil.generateToken(loggedinUser);
             return ResponseEntity.ok(new JwtResponse(token));
         } else {
             return ResponseEntity.status(401).body("Invalid username or password");

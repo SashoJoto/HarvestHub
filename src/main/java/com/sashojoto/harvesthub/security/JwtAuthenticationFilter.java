@@ -33,11 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             if (jwtTokenUtil.validateToken(token)) {
-                String username = jwtTokenUtil.getUsernameFromToken(token);
+                String userId = jwtTokenUtil.getUsernameFromToken(token);
 
                 // Create authentication object and set it in the security context
                 User user = new User();
-                user.setUsername(username);
+                user.setId(Long.valueOf(userId));
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 user,

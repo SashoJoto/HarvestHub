@@ -1,33 +1,25 @@
 import React, {useEffect, useState} from "react";
-import {Typography, Button, Box, Avatar, Card} from "@mui/material";
+import {Avatar, Box, Button, Card, Typography} from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Product from "../components/Product";
-import axios from "axios";
-import {ProductControllerApi, ProductDto, ProductDtoCurrencyEnum} from "../api";
-
-// Define the structure of a product
-interface Product {
-    id: number;
-    title: string;
-    location: string;
-    price: number;
-    date: string;
-    user: {
-        name: string;
-        avatar: string;
-    };
-    image: string;
-    currency: ProductDtoCurrencyEnum;
-}
-
-
+import {ProductControllerApi, ProductDto, UserControllerApi, UserDto} from "../api";
+import {jwtDecode} from "jwt-decode";
 
 const Profile: React.FC = () => {
     const navigate = useNavigate();
     // State to manage product list
     let [products, setProducts] = useState<ProductDto[]>([]);
     const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<UserDto | null>({
+        id: -1,
+        username: "",
+        email: "",
+    });
+
+    const jwtToken: string | null = localStorage.getItem("jwtToken");
+    const jwtDecoded: any = jwtDecode<string>(jwtToken || "");
+    const userId: string = jwtDecoded.sub;
 
     const logout = () => {
         localStorage.removeItem("jwtToken"); // Clear token from storage
@@ -39,29 +31,22 @@ const Profile: React.FC = () => {
         const productController: ProductControllerApi = new ProductControllerApi();
         productController.getAllProducts()
             .then(response => {
-                products = response.data;
+                setProducts(response.data);
+                setLoading(false);
             })
             .catch(error => {
                 alert("Error fetching products: " + error.message);
             })
 
-
-        const fetchUserProducts = async () => {
-            try {
-                const response = await axios.get("/api/products", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with proper token storage
-                    },
-                });
-                setProducts(response.data);
-            } catch (error) {
-                console.error("Error fetching user products:", error);
-            } finally {
+        const userController: UserControllerApi = new UserControllerApi();
+        userController.getUser(Number(userId))
+            .then(response => {
+                setUser(response.data);
                 setLoading(false);
-            }
-        };
-
-        fetchUserProducts();
+            })
+            .catch(error => {
+                alert("Error fetching user: " + error.message);
+            })
     }, []);
 
     return (
@@ -125,7 +110,7 @@ const Profile: React.FC = () => {
                                 fontSize: {xs: "22px", sm: "28px"}, // Adjust text size
                             }}
                         >
-                            John Doe
+                            {user.username}
                         </Typography>
                         <Typography
                             variant="body1"

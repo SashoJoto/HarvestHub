@@ -24,12 +24,15 @@ public class UserService {
         return userMapper.userToUserDto(user);
     }
 
-    public boolean login(LoginRequest loginRequest) {
+    public User login(LoginRequest loginRequest) {
         List<User> users = userRepository.findByUsernameAndPassword(loginRequest.getUsername(), loginRequest.getPassword());
-        return users.size() == 1;
+        if (users.isEmpty() || users.size() != 1) {
+            return null;
+        }
+        return users.get(0);
     }
 
-    public User getUserByName(String name) {
-        return userRepository.findByUsername(name);
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new HarvestHubException("Can't find user for id[%d]", id));
     }
 }
