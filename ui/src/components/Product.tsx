@@ -9,25 +9,32 @@ import {
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"; // Heart icon
 
 interface ProductProps {
-    // image: string;
     title: string;
-    // user: {
-    //     name: string;
-    //     avatar: string;
-    // };
-    // location: string;
-    // date: string;
     price: number | undefined;
+    currency: "USD" | "GBP" | "BGN" | "EUR"; // Add currency as a prop
 }
 
 const Product: React.FC<ProductProps> = ({
-                                             // image,
                                              title,
-                                             // user,
-                                             // location,
-                                             // date,
                                              price,
+                                             currency,
                                          }) => {
+    // Function to get the correct currency symbol
+    const getCurrencySymbol = (currency: string) => {
+        switch (currency) {
+            case "USD":
+                return "$";
+            case "EUR":
+                return "€";
+            case "GBP":
+                return "£";
+            case "BGN":
+                return "лв";
+            default:
+                return ""; // Default to no symbol if currency is unknown
+        }
+    };
+
     return (
         <Box
             sx={{
@@ -44,25 +51,9 @@ const Product: React.FC<ProductProps> = ({
                 },
                 maxWidth: "900px", // Constrain width for consistent layout
                 width: "100%",
-                marginTop:2
+                marginTop: 2,
             }}
         >
-            {/* Left Section: Product Image */}
-            {/*<Box>*/}
-            {/*    <ButtonBase>*/}
-            {/*        <img*/}
-            {/*            src={image}*/}
-            {/*            alt={title}*/}
-            {/*            style={{*/}
-            {/*                width: "150px",*/}
-            {/*                height: "150px",*/}
-            {/*                borderRadius: "4px",*/}
-            {/*                objectFit: "cover",*/}
-            {/*            }}*/}
-            {/*        />*/}
-            {/*    </ButtonBase>*/}
-            {/*</Box>*/}
-
             {/* Center Section: Product Info */}
             <Box
                 sx={{
@@ -80,31 +71,6 @@ const Product: React.FC<ProductProps> = ({
                 >
                     {title}
                 </Typography>
-
-                {/* Middle Section: User */}
-                {/*<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>*/}
-                {/*    <Avatar src={user.avatar} alt={user.name} sx={{ width: 30, height: 30 }} />*/}
-                {/*    <Typography variant="subtitle2" sx={{ color: "text.secondary" }}>*/}
-                {/*        {user.name}*/}
-                {/*    </Typography>*/}
-                {/*</Box>*/}
-
-                {/* Bottom Section: Location and Creation Date */}
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        marginTop: "auto", // Push to bottom
-                        gap: 0.5, // Small space between location and date
-                    }}
-                >
-                    {/*<Typography variant="body2" sx={{ color: "text.secondary" }}>*/}
-                    {/*    {location}*/}
-                    {/*</Typography>*/}
-                    {/*<Typography variant="body2" sx={{ color: "text.secondary" }}>*/}
-                    {/*    {date}*/}
-                    {/*</Typography>*/}
-                </Box>
             </Box>
 
             {/* Right Section: Price & Like Button */}
@@ -124,7 +90,7 @@ const Product: React.FC<ProductProps> = ({
                         fontWeight: "bold",
                     }}
                 >
-                    {price}$
+                    {price ? `${price}${getCurrencySymbol(currency)}` : "N/A"}
                 </Typography>
 
                 {/* Like Button */}

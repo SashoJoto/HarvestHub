@@ -17,7 +17,8 @@ import Navbar from "../components/Navbar.tsx";
 import {
     ProductControllerApi,
     ProductDto,
-    ProductDtoCurrencyEnum, ProductDtoCategoryEnum,
+    ProductDtoCurrencyEnum,
+    ProductDtoCategoryEnum,
     ProductDtoShippingResponsibilityEnum,
     ProductDtoUnitsEnum,
 } from "../api";
@@ -37,7 +38,6 @@ const AddProduct: React.FC = () => {
     const [errors, setErrors] = useState({
         quantity: false,
         price: false,
-        category: false,
     });
 
     // Snackbar state
@@ -70,9 +70,41 @@ const AddProduct: React.FC = () => {
         setSnackbarOpen(false);
     };
 
+    // Handle submit with validation for required fields
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        let productDto: ProductDto = {
+
+        // Validation checks for required fields
+        if (!formValues.productName) {
+            setSnackbarMessage("Product Name is required.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (!formValues.description) {
+            setSnackbarMessage("Description is required.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (formValues.quantity <= 0) {
+            setSnackbarMessage("Quantity must be a positive number.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (formValues.price <= 0) {
+            setSnackbarMessage("Price must be a positive number.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
+        // If validation passes, construct product DTO and proceed with API call
+        const productDto: ProductDto = {
             name: formValues.productName,
             description: formValues.description,
             quantity: formValues.quantity,
@@ -93,13 +125,11 @@ const AddProduct: React.FC = () => {
                 setSnackbarOpen(true); // Show success message
             })
             .catch((error) => {
-                console.log(error);
+                console.error(error);
                 setSnackbarMessage("Failed to add product. Please try again.");
                 setSnackbarSeverity("error");
                 setSnackbarOpen(true); // Show error message
             });
-
-        // Additional validation can be added if necessary
     };
 
     return (
@@ -140,13 +170,13 @@ const AddProduct: React.FC = () => {
                             <MenuItem value={ProductDtoCategoryEnum.FlowersProducts}>Flowers Products</MenuItem>
                         </Select>
                     </FormControl>
+
                     {/* Product Name */}
                     <TextField
                         name="productName"
                         label="Product Name"
                         variant="outlined"
                         fullWidth
-                        required
                         value={formValues.productName}
                         onChange={handleChange}
                         sx={{ mb: 2 }}
@@ -160,7 +190,6 @@ const AddProduct: React.FC = () => {
                         multiline
                         rows={4}
                         fullWidth
-                        required
                         value={formValues.description}
                         onChange={handleChange}
                         sx={{ mb: 2 }}

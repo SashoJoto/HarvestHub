@@ -6,7 +6,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
-import {ProductControllerApi, ProductDto} from "../api";
+import {ProductControllerApi, ProductDto, ProductDtoCurrencyEnum} from "../api";
 
 // interface Product {
 //     title: string;
@@ -60,6 +60,22 @@ const ProductPage: React.FC = () => {
     //     autoplaySpeed: 3000,
     //     pauseOnHover: true,
     // };
+
+    const getCurrencySymbol = (currency: ProductDtoCurrencyEnum | undefined): string => {
+        switch (currency) {
+            case "USD":
+                return "$";
+            case "GBP":
+                return "£";
+            case "BGN":
+                return "лв";
+            case "EUR":
+                return "€";
+            default:
+                return ""; // If no currency is specified
+        }
+    };
+
 
     if (loading) {
         return <Typography>Loading product...</Typography>;
@@ -129,7 +145,7 @@ const ProductPage: React.FC = () => {
                             color: "white",
                         }}
                     >
-                        ${product.price!.toFixed(2)}
+                        {product.price ? `${product.price}${getCurrencySymbol(product.currency)}` : 'N/A'}
                     </Typography>
 
                     {/* Add to Favorites Button */}

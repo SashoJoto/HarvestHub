@@ -209,6 +209,7 @@ const HomePage: React.FC = () => {
                                         <Product
                                             title={product.name!}
                                             price={product.price}
+                                            currency={product.currency || "BGN"}
                                         />
                                     </Link>
                                 ))

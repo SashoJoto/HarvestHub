@@ -1,37 +1,38 @@
-import React, {useEffect, useState} from "react";
-import {Typography, Button, Box, Avatar, Card} from "@mui/material";
-import {Link, useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Typography, Button, Box, Avatar, Card } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Product from "../components/Product";
 import axios from "axios";
-import {ProductControllerApi, ProductDto} from "../api";
+import { ProductControllerApi, ProductDto, ProductDtoCurrencyEnum } from "../api";
 
-// Define the structure of a product
-interface Product {
-    id: number;
-    title: string;
-    location: string;
-    price: number;
-    date: string;
-    user: {
-        name: string;
-        avatar: string;
-    };
-    image: string;
+// Define the structure of a user
+interface User {
+    username: string;
+    email: string;
+    phone: string;
+    address: string;
+    aboutMe: string;
+    avatar?: string; // Optional: if you want to include profile picture URL
 }
 
+// Component to display profile
 const Profile: React.FC = () => {
     const navigate = useNavigate();
+
     // State to manage product list
     let [products, setProducts] = useState<ProductDto[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // State to manage user information
+    const [user, setUser] = useState<User | null>(null);
 
     const logout = () => {
         localStorage.removeItem("jwtToken"); // Clear token from storage
         navigate("/login"); // Redirect to login page
     };
 
-    // Fetch products when the component loads
+    // Fetch user and product data when the component loads
     useEffect(() => {
         const productController: ProductControllerApi = new ProductControllerApi();
         productController.getAllProducts()
@@ -40,8 +41,7 @@ const Profile: React.FC = () => {
             })
             .catch(error => {
                 alert("Error fetching products: " + error.message);
-            })
-
+            });
 
         const fetchUserProducts = async () => {
             try {
@@ -58,13 +58,33 @@ const Profile: React.FC = () => {
             }
         };
 
+        const fetchUserProfile = async () => {
+            try {
+                const userId = localStorage.getItem("userId"); // Assuming user ID is saved in local storage
+                if (!userId) throw new Error("User ID not found!");
+
+                const response = await axios.get<User>(`/api/user/${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`, // Pass token if required
+                    },
+                });
+                setUser(response.data); // Update user state with fetched data
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+                alert("Failed to fetch user profile. Please try again.");
+                // Optionally, redirect back to login if user fetching fails
+                logout();
+            }
+        };
+
         fetchUserProducts();
+        fetchUserProfile(); // Fetch user profile
     }, []);
 
     return (
         <>
             {/* Navbar */}
-            <Navbar/>
+            <Navbar />
 
             {/* Profile Section */}
             <Box
@@ -85,22 +105,22 @@ const Profile: React.FC = () => {
                         width: "100%",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: {xs: "center", sm: "space-between"}, // Centered on mobile
+                        justifyContent: { xs: "center", sm: "space-between" }, // Centered on mobile
                         flexWrap: "wrap", // Ensure it wraps properly
                         gap: 3,
-                        flexDirection: {xs: "column", sm: "row"}, // Stack vertically on mobile
+                        flexDirection: { xs: "column", sm: "row" }, // Stack vertically on mobile
                     }}
                 >
                     {/* Profile Picture */}
                     <Avatar
                         alt="Profile Picture"
-                        src="/path-to-profile-photo.jpg"
+                        src={user?.avatar || "/path-to-profile-photo.jpg"} // Use fetched avatar or placeholder
                         sx={{
-                            width: {xs: "120px", sm: "200px"}, // Adjust size for mobile larger
-                            height: {xs: "120px", sm: "200px"},
+                            width: { xs: "120px", sm: "200px" }, // Adjust size for mobile larger
+                            height: { xs: "120px", sm: "200px" },
                             border: "4px solid #ddd",
                             boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-                            marginBottom: {xs: 2, sm: 0}, // Add space below image on mobile
+                            marginBottom: { xs: 2, sm: 0 }, // Add space below image on mobile
                         }}
                     />
 
@@ -110,8 +130,8 @@ const Profile: React.FC = () => {
                             flexGrow: 1,
                             display: "flex",
                             flexDirection: "column",
-                            alignItems: {xs: "center", sm: "flex-start"}, // Center text on mobile
-                            textAlign: {xs: "center", sm: "left"}, // Center-align text for mobile
+                            alignItems: { xs: "center", sm: "flex-start" }, // Center text on mobile
+                            textAlign: { xs: "center", sm: "left" }, // Center-align text for mobile
                             gap: 1,
                         }}
                     >
@@ -119,37 +139,37 @@ const Profile: React.FC = () => {
                             variant="h4"
                             sx={{
                                 fontWeight: "bold",
-                                fontSize: {xs: "22px", sm: "28px"}, // Adjust text size
+                                fontSize: { xs: "22px", sm: "28px" }, // Adjust text size
                             }}
                         >
-                            John Doe
+                            {user?.username || "Loading..."}
                         </Typography>
                         <Typography
                             variant="body1"
                             sx={{
-                                fontSize: {xs: "16px", sm: "20px"}, // Adjust text size
+                                fontSize: { xs: "16px", sm: "20px" }, // Adjust text size
                                 wordBreak: "break-word", // Prevent text from overflowing
                             }}
                         >
-                            <strong>Email:</strong> john.doe@example.com
+                            <strong>Email:</strong> {user?.email || "Loading..."}
                         </Typography>
                         <Typography
                             variant="body1"
                             sx={{
-                                fontSize: {xs: "16px", sm: "20px"},
+                                fontSize: { xs: "16px", sm: "20px" },
                                 wordBreak: "break-word",
                             }}
                         >
-                            <strong>Phone:</strong> +123 456 7890
+                            <strong>Phone:</strong> {user?.phone || "Loading..."}
                         </Typography>
                         <Typography
                             variant="body1"
                             sx={{
-                                fontSize: {xs: "16px", sm: "20px"},
+                                fontSize: { xs: "16px", sm: "20px" },
                                 wordBreak: "break-word",
                             }}
                         >
-                            <strong>Address:</strong> 123, Main Street, Springfield
+                            <strong>Address:</strong> {user?.address || "Loading..."}
                         </Typography>
                     </Box>
 
@@ -160,7 +180,7 @@ const Profile: React.FC = () => {
                             flexDirection: "column",
                             alignItems: "center", // Center align on mobile
                             gap: 2,
-                            width: {xs: "100%", sm: "auto"}, // Full width on mobile
+                            width: { xs: "100%", sm: "auto" }, // Full width on mobile
                         }}
                     >
                         <Button
@@ -168,7 +188,7 @@ const Profile: React.FC = () => {
                             color="primary"
                             fullWidth={false}
                             sx={{
-                                width: {xs: "100%", sm: "150px"}, // Full-width buttons on mobile
+                                width: { xs: "100%", sm: "150px" }, // Full-width buttons on mobile
                             }}
                             onClick={() => alert("Edit Profile Clicked")}
                         >
@@ -178,7 +198,7 @@ const Profile: React.FC = () => {
                             variant="contained"
                             color="secondary"
                             sx={{
-                                width: {xs: "100%", sm: "150px"}, // Full-width buttons on mobile
+                                width: { xs: "100%", sm: "150px" }, // Full-width buttons on mobile
                             }}
                             onClick={logout}
                         >
@@ -216,9 +236,7 @@ const Profile: React.FC = () => {
                             fontSize: "16px",
                         }}
                     >
-                        Hi! I'm John. I’m a software engineer with a passion for creating
-                        user-centric web applications. I love collaborating with others and
-                        learning new technologies!
+                        {user?.aboutMe || "Hi! I'm John. I’m a software engineer with a passion for creating user-centric web applications. I love collaborating with others and learning new technologies!"}
                     </Typography>
                 </Card>
             </Box>
@@ -234,7 +252,7 @@ const Profile: React.FC = () => {
             >
                 <Typography
                     variant="h6"
-                    sx={{fontWeight: "bold", mb: 2, textAlign: "center"}}
+                    sx={{ fontWeight: "bold", mb: 2, textAlign: "center" }}
                 >
                     Your Products
                 </Typography>
@@ -254,18 +272,12 @@ const Profile: React.FC = () => {
                             <Link
                                 to={`/product/${product.id}`} // Dynamic link to product page
                                 key={product.id}
-                                style={{textDecoration: "none"}}
+                                style={{ textDecoration: "none" }}
                             >
                                 <Product
-                                    // image={product.image}
                                     title={product.name!}
-                                    // user={{
-                                    //     name: product.user.name,
-                                    //     avatar: product.user.avatar,
-                                    // }}
-                                    // location={product.location}
-                                    // date={product.date}
                                     price={product.price}
+                                    currency={product.currency || "BGN"}
                                 />
                             </Link>
                         ))}

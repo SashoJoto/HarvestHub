@@ -12,15 +12,16 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public User createUser(User user) {
         User createdUser = userRepository.save(user);
         return createdUser;
     }
 
-    public User getUser(Long userId) {
+    public UserDto getUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new HarvestHubException("Can't find user for id[%d]", userId));
-        return user;
+        return userMapper.userToUserDto(user);
     }
 
     public boolean login(LoginRequest loginRequest) {
