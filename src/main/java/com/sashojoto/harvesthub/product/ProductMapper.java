@@ -11,6 +11,7 @@ public interface ProductMapper {
 
     @Mapping(source = "owner.id", target = "userId")
     @Mapping(source = "owner.username", target = "ownerName")
+    @Mapping(source = "owner.address", target = "ownerAddress")
     ProductDto toDto(Product product);
 
     Product toProduct(ProductDto productDto);

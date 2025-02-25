@@ -26,4 +26,5 @@ public class ProductDto {
 
     private Long userId;
     private String ownerName;
+    private String ownerAddress;
 }

@@ -10,6 +10,7 @@ import ProductPage from "../pages/ProductPage";
 import PrivateRoute from "../security/PrivateRoute.tsx";
 import RegisterPage from "../pages/RegisterPage.tsx";
 import HomePage from "../pages/HomePage.tsx";
+import EditProfilePage from "../pages/EditProfilePage.tsx";
 
 // Add product id
 const AppRoutes: React.FC = () => {
@@ -29,6 +30,7 @@ const AppRoutes: React.FC = () => {
                     <Route path="/add-product" element={<AddProductPage/>}/>
                     <Route path="/profile" element={<ProfilePage/>}/>
                     <Route path="/product/:id" element={<ProductPage/>}/>
+                    <Route path="/edit-profile" element={<EditProfilePage/>}/>
                     <Route path="*" element={<Navigate to="/" replace/>}/>
                 </Route>
             </Routes>

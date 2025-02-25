@@ -24,6 +24,11 @@ const Profile: React.FC = () => {
         description: "",
     });
 
+    const goToEditProfile = () => {
+        navigate("/edit-profile", { state: { user } }); // Pass the user data as state to EditProfilePage.tsx
+    };
+
+
     const jwtToken: string | null = localStorage.getItem("jwtToken");
     const jwtDecoded: any = jwtDecode<string>(jwtToken || "");
     const userId: string = jwtDecoded.sub;
@@ -148,7 +153,10 @@ const Profile: React.FC = () => {
                                 wordBreak: "break-word",
                             }}
                         >
-                            <strong>Phone:</strong> {user.phoneNumber}
+                            <strong>Phone:</strong>{" "}
+                            {user.phoneNumber && user.phoneNumber.trim() !== ""
+                                ? user.phoneNumber
+                                : "No phone number given"}
                         </Typography>
                         <Typography
                             variant="body1"
@@ -157,7 +165,10 @@ const Profile: React.FC = () => {
                                 wordBreak: "break-word",
                             }}
                         >
-                            <strong>Address:</strong> {user.address}
+                            <strong>Address:</strong>{" "}
+                            {user.address && user.address.trim() !== ""
+                                ? user.address
+                                : "No address given"}
                         </Typography>
                     </Box>
 
@@ -178,7 +189,7 @@ const Profile: React.FC = () => {
                             sx={{
                                 width: { xs: "100%", sm: "150px" }, // Full-width buttons on mobile
                             }}
-                            onClick={() => alert("Edit Profile Clicked")}
+                            onClick={goToEditProfile}
                         >
                             Edit Profile
                         </Button>
@@ -266,6 +277,8 @@ const Profile: React.FC = () => {
                                     title={product.name!}
                                     price={product.price}
                                     currency={product.currency || "BGN"}
+                                    username={product.ownerName}
+                                    address={product.ownerAddress}
                                 />
                             </Link>
                         ))}

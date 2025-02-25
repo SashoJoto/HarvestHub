@@ -2,9 +2,7 @@ import React from "react";
 import {
     Box,
     Typography,
-    // Avatar,
     IconButton,
-    // ButtonBase,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"; // Heart icon
 
@@ -13,13 +11,15 @@ interface ProductProps {
     price: number | undefined;
     currency: "USD" | "GBP" | "BGN" | "EUR"; // Add currency as a prop
     username: string;
+    address: string;
 }
 
 const Product: React.FC<ProductProps> = ({
                                              title,
                                              price,
                                              currency,
-                                             username
+                                             username,
+                                             address,
                                          }) => {
     // Function to get the correct currency symbol
     const getCurrencySymbol = (currency: string) => {
@@ -40,6 +40,7 @@ const Product: React.FC<ProductProps> = ({
     return (
         <Box
             sx={{
+                position: "relative", // To allow absolute positioning inside the box
                 display: "flex",
                 alignItems: "flex-start",
                 padding: 3,
@@ -54,24 +55,27 @@ const Product: React.FC<ProductProps> = ({
                 maxWidth: "900px", // Constrain width for consistent layout
                 width: "100%",
                 marginTop: 2,
+                minHeight: "200px", // Ensure enough space for content
             }}
         >
-            {/* Center Section: Product Info */}
+            {/* Left Section: Product Title */}
             <Box
                 sx={{
                     flex: 1,
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "space-between",
                 }}
             >
-                {/* Top Section: Title */}
+                {/* Product Title */}
                 <Typography
                     variant="h5"
                     component="span"
-                    sx={{ fontWeight: "bold", marginBottom: 1 }}
+                    sx={{
+                        fontWeight: "bold",
+                        marginBottom: 1,
+                    }}
                 >
-                    {title} / {username}
+                    {title}
                 </Typography>
             </Box>
 
@@ -99,6 +103,33 @@ const Product: React.FC<ProductProps> = ({
                 <IconButton sx={{ color: "secondary.main" }}>
                     <FavoriteBorderIcon />
                 </IconButton>
+            </Box>
+
+            {/* Bottom Section: Username and Address */}
+            <Box
+                sx={{
+                    position: "absolute", // Absolutize this section
+                    bottom: 16, // Offset to the bottom
+                    left: 25, // Offset to the left
+                }}
+            >
+                <Typography
+                    variant="body1"
+                    sx={{
+                        color: "#e0e0e0",
+                        fontWeight: "bold",
+                    }}
+                >
+                    {username}
+                </Typography>
+                <Typography
+                    variant="body2"
+                    sx={{
+                        color: "#9e9e9e",
+                    }}
+                >
+                    {address}
+                </Typography>
             </Box>
         </Box>
     );
