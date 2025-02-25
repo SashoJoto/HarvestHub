@@ -10,6 +10,7 @@ public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
     @Mapping(source = "owner.id", target = "userId")
+    @Mapping(source = "owner.username", target = "ownerName")
     ProductDto toDto(Product product);
 
     Product toProduct(ProductDto productDto);

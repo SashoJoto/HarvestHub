@@ -12,12 +12,14 @@ interface ProductProps {
     title: string;
     price: number | undefined;
     currency: "USD" | "GBP" | "BGN" | "EUR"; // Add currency as a prop
+    username: string;
 }
 
 const Product: React.FC<ProductProps> = ({
                                              title,
                                              price,
                                              currency,
+                                             username
                                          }) => {
     // Function to get the correct currency symbol
     const getCurrencySymbol = (currency: string) => {
@@ -69,7 +71,7 @@ const Product: React.FC<ProductProps> = ({
                     component="span"
                     sx={{ fontWeight: "bold", marginBottom: 1 }}
                 >
-                    {title}
+                    {title} / {username}
                 </Typography>
             </Box>
 
