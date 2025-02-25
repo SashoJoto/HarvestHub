@@ -11,6 +11,8 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     // Map User entity to UserDto
-    // @Mapping(target = "password", ignore = true) // Ensure the password field is not included
+    @Mapping(target = "phoneNumber", source = "phoneNumber")
+    @Mapping(target = "address", source = "address")
+    @Mapping(target = "description", source = "description")
     UserDto userToUserDto(User user);
 }

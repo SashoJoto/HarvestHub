@@ -14,9 +14,9 @@ import { AuthControllerApi, LoginRequest } from "../api";
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login state
-    const [credentials, setCredentials] = useState({ email: "", password: "" });
+    const [credentials, setCredentials] = useState({ username: "", password: "" });
 
-    const emailInputRef = useRef<HTMLInputElement>(null);
+    const UsernameInputRef = useRef<HTMLInputElement>(null);
 
     // Snackbar state
     const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
     const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("error");
 
     useEffect(() => {
-        emailInputRef.current?.focus(); // Focus on the email input
+        UsernameInputRef.current?.focus(); // Focus on the email input
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +42,7 @@ const LoginPage: React.FC = () => {
         event.preventDefault();
         const authentication: AuthControllerApi = new AuthControllerApi();
         let loginRequest: LoginRequest = {
-            username: credentials.email,
+            username: credentials.username,
             password: credentials.password,
         };
         authentication
@@ -112,10 +112,10 @@ const LoginPage: React.FC = () => {
                     >
                         {/* Email Input */}
                         <TextField
-                            label="Email"
-                            name="email"
-                            inputRef={emailInputRef}
-                            value={credentials.email}
+                            label="Username"
+                            name="username"
+                            inputRef={UsernameInputRef}
+                            value={credentials.username}
                             onChange={handleChange}
                             fullWidth
                             required

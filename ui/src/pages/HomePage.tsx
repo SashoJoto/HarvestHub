@@ -13,7 +13,6 @@ import Product from "../components/Product";
 import { Link } from "react-router-dom";
 import { ProductControllerApi, ProductDto } from "../api";
 
-// Updated categories list to include API values
 const categories = [
     { name: "Dairy Products", value: "Dairy_Products" },
     { name: "Meat and Poultry", value: "Meat_and_Poultry_Products" },
@@ -42,7 +41,7 @@ const HomePage: React.FC = () => {
 
     // Handle text-based search
     const handleSearch = () => {
-        if (searchQuery.trim() === "") return; // Empty input, do nothing
+        if (searchQuery.trim() === "") return; // Ignore empty queries
 
         productApi
             .searchProducts(searchQuery) // Backend API call for search
@@ -55,6 +54,13 @@ const HomePage: React.FC = () => {
             });
     };
 
+    // Handle Enter key press for searching
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === "Enter") {
+            handleSearch();
+        }
+    };
+
     // Handle category-based search
     const handleCategorySearch = (categoryValue: string) => {
         productApi
@@ -62,7 +68,7 @@ const HomePage: React.FC = () => {
             .then((response) => {
                 setSearchResults(response.data);
                 setIsSearching(true);
-                // Set the search query to display the selected category name
+                // Update the search query to display selected category name
                 setSearchQuery(`Category: ${categories.find((cat) => cat.value === categoryValue)?.name}`);
             })
             .catch((error) => {
@@ -122,6 +128,7 @@ const HomePage: React.FC = () => {
                                 placeholder="Search for something..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={handleKeyDown} // Added Enter key event listener
                                 sx={{ mr: 1 }} // Margin-right for space between search bar and button
                             />
                             <Button variant="contained" color="secondary" onClick={handleSearch}>

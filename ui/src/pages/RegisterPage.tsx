@@ -1,19 +1,32 @@
-import React, {useState, useEffect, useRef} from "react";
-import {Box, TextField, Button, Typography} from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import { Box, TextField, Button, Typography, Snackbar, Alert } from "@mui/material";
 import Navbar from "../components/Navbar";
-import {User, UserControllerApi} from "../api";
-import {useNavigate} from "react-router-dom";
+import { User, UserControllerApi } from "../api";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
-    const [isRegistered, setIsRegistered] = useState(false); // Track registration state
+    const [isRegistered, setIsRegistered] = useState(false);
+
+    // Form state for registration
     const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
         username: "",
         email: "",
+        phoneNumber: "+359", // Start with +359 prefilled for phone number
+        address: "",
+        description: "",
         password: "",
         confirmPassword: "",
-    }); // Form state for registration
-    const usernameInputRef = useRef<HTMLInputElement>(null); // Reference for the username field
+    });
+
+    // Snackbar state
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("error");
+
+    const usernameInputRef = useRef<HTMLInputElement>(null);
 
     // Set the focus on the username field when the page loads
     useEffect(() => {
@@ -22,31 +35,96 @@ const RegisterPage: React.FC = () => {
 
     // Handle form input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-        setFormData((prev) => ({...prev, [name]: value}));
+        const { name, value } = e.target;
+
+        if (name === "phoneNumber") {
+            // Ensure phoneNumber always starts with +359
+            const newValue = value.startsWith("+359") ? value : `+359${value.replace(/^\+?359/, "")}`;
+            setFormData((prev) => ({ ...prev, phoneNumber: newValue }));
+        } else {
+            setFormData((prev) => ({ ...prev, [name]: value }));
+        }
+    };
+
+    // Snackbar handlers
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
     };
 
     // Handle registration form submission
     const register = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault(); // Prevent page reload
-        const {username, email, password, confirmPassword} = formData;
+        const {
+            firstName,
+            lastName,
+            username,
+            email,
+            phoneNumber,
+            password,
+            confirmPassword,
+        } = formData;
 
-        // Basic validation
-        if (!username || !email || !password || !confirmPassword) {
-            alert("Please fill out all fields.");
+        // Custom validation
+        if (!firstName) {
+            setSnackbarMessage("Please provide your first name.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
             return;
         }
+
+        if (!lastName) {
+            setSnackbarMessage("Please provide your last name.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (!username) {
+            setSnackbarMessage("Please provide a username.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setSnackbarMessage("Please provide a valid email address.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (!phoneNumber || phoneNumber.length !== 13 || !/^\+359[0-9]{9}$/.test(phoneNumber)) {
+            setSnackbarMessage("Phone number must be +359 followed by 9 digits.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
+        if (!password || !confirmPassword) {
+            setSnackbarMessage("Password and Confirm Password are required.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
         if (password !== confirmPassword) {
-            alert("Passwords do not match.");
+            setSnackbarMessage("Passwords do not match.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
             return;
         }
 
         // API call to register
         const userController = new UserControllerApi();
         const user: User = {
-            username: username,
-            email: email,
-            password: password,
+            firstName,
+            lastName,
+            username,
+            email,
+            password,
+            phoneNumber,
+            address: formData.address,
+            description: formData.description,
         };
 
         userController
@@ -54,25 +132,29 @@ const RegisterPage: React.FC = () => {
             .then((response) => {
                 if (response.status === 200) {
                     setIsRegistered(true);
-                    alert("Registration successful! Redirecting to login...");
-                    navigate("/login"); // Redirect to login page after successful registration
+                    setSnackbarMessage("Registration successful! Redirecting to login...");
+                    setSnackbarSeverity("success");
+                    setSnackbarOpen(true);
+
+                    setTimeout(() => navigate("/login"), 1500); // Redirect to login after success
                 }
             })
             .catch((error) => {
-                alert("An error occurred during registration. " + (error.message || "Please try again."));
+                setSnackbarMessage("Registration failed. " + (error.message || "Please try again."));
+                setSnackbarSeverity("error");
+                setSnackbarOpen(true);
             });
     };
 
     return (
         <>
             {/* Navbar */}
-            <Navbar/>
+            <Navbar />
 
-            {/* Show Registration Form if Not Registered Yet */}
             {!isRegistered ? (
                 <Box
                     sx={{
-                        height: "calc(100vh - 64px)", // Adjust for navbar height
+                        height: "calc(100vh - 64px)",
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
@@ -80,7 +162,6 @@ const RegisterPage: React.FC = () => {
                         padding: 2,
                     }}
                 >
-                    {/* Heading */}
                     <Typography
                         variant="h4"
                         sx={{
@@ -92,10 +173,9 @@ const RegisterPage: React.FC = () => {
                         Create a New Account
                     </Typography>
 
-                    {/* Registration Form */}
                     <Box
                         component="form"
-                        onSubmit={register} // Attach submit handler
+                        onSubmit={register}
                         sx={{
                             width: "90%",
                             maxWidth: "400px",
@@ -104,6 +184,26 @@ const RegisterPage: React.FC = () => {
                             gap: 2,
                         }}
                     >
+                        {/* First Name Input */}
+                        <TextField
+                            label="First Name"
+                            name="firstName"
+                            type="text"
+                            value={formData.firstName}
+                            onChange={handleChange}
+                            fullWidth
+                        />
+
+                        {/* Last Name Input */}
+                        <TextField
+                            label="Last Name"
+                            name="lastName"
+                            type="text"
+                            value={formData.lastName}
+                            onChange={handleChange}
+                            fullWidth
+                        />
+
                         {/* Username Input */}
                         <TextField
                             label="Username"
@@ -113,18 +213,52 @@ const RegisterPage: React.FC = () => {
                             value={formData.username}
                             onChange={handleChange}
                             fullWidth
-                            required
                         />
 
                         {/* Email Input */}
                         <TextField
                             label="Email"
                             name="email"
-                            type="email"
+                            type="text" // Removed 'email' type to disable default validation
                             value={formData.email}
                             onChange={handleChange}
                             fullWidth
-                            required
+                        />
+
+                        {/* Phone Number Input */}
+                        <TextField
+                            label="Phone Number"
+                            name="phoneNumber"
+                            type="text"
+                            value={formData.phoneNumber}
+                            onChange={handleChange}
+                            fullWidth
+                            InputProps={{
+                                inputProps: {
+                                    maxLength: 13, // Enforcing exact length
+                                },
+                            }}
+                        />
+
+                        {/* Address Input */}
+                        <TextField
+                            label="Address (Optional)"
+                            name="address"
+                            type="text"
+                            value={formData.address}
+                            onChange={handleChange}
+                            fullWidth
+                        />
+
+                        {/* Description Input */}
+                        <TextField
+                            label="Description (Optional)"
+                            name="description"
+                            multiline
+                            rows={5}
+                            value={formData.description}
+                            onChange={handleChange}
+                            fullWidth
                         />
 
                         {/* Password Input */}
@@ -135,7 +269,6 @@ const RegisterPage: React.FC = () => {
                             value={formData.password}
                             onChange={handleChange}
                             fullWidth
-                            required
                         />
 
                         {/* Confirm Password Input */}
@@ -146,10 +279,8 @@ const RegisterPage: React.FC = () => {
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             fullWidth
-                            required
                         />
 
-                        {/* Register Button */}
                         <Button
                             variant="contained"
                             color="primary"
@@ -159,7 +290,6 @@ const RegisterPage: React.FC = () => {
                             Register
                         </Button>
 
-                        {/* Redirect to Login */}
                         <Typography
                             variant="body2"
                             sx={{
@@ -174,7 +304,7 @@ const RegisterPage: React.FC = () => {
                                 href="/login"
                                 variant="text"
                                 size="small"
-                                sx={{padding: 0}}
+                                sx={{ padding: 0 }}
                             >
                                 Log In
                             </Button>
@@ -182,29 +312,24 @@ const RegisterPage: React.FC = () => {
                     </Box>
                 </Box>
             ) : (
-                // Show Success Message After Registration
-                <Box
-                    sx={{
-                        padding: {xs: 2, sm: 4},
-                        maxWidth: "800px",
-                        margin: "0 auto",
-                        textAlign: "center",
-                    }}
-                >
-                    <Typography
-                        variant="h5"
-                        sx={{fontWeight: "bold", marginTop: 3}}
-                    >
-                        Registration Successful!
-                    </Typography>
-                    <Typography
-                        variant="body1"
-                        sx={{marginTop: 2, color: "text.secondary"}}
-                    >
-                        Your account has been created. You can now log in to access the platform.
-                    </Typography>
-                </Box>
+                <></>
             )}
+
+            {/* Snackbar */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={5000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={snackbarSeverity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 };
