@@ -1,6 +1,8 @@
 package com.sashojoto.harvesthub.user;
 
+import com.sashojoto.harvesthub.exceptions.HarvestHubException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,9 +18,13 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public User createUser(@RequestBody User user) {
-        User userCreated = userService.createUser(user);
-        return userCreated;
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            User userCreated = userService.createUser(user);
+            return ResponseEntity.ok(userCreated);
+        } catch (HarvestHubException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
 }

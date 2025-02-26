@@ -16,7 +16,6 @@ const EditProfilePage: React.FC = () => {
     const [formData, setFormData] = useState<UserDto>({
         ...currentUser,
         phoneNumber: currentUser.phoneNumber || "+359", // Ensure +359 is set by default for phone numbers
-        password: "", // Password should initially be blank
     });
 
     // Snackbar state management
@@ -87,7 +86,6 @@ const EditProfilePage: React.FC = () => {
             // Fetch the current user to merge the old data with the newly updated fields
             const updatedUser: UserDto = { ...currentUser, ...formData };
 
-            if (!updatedUser.password) delete updatedUser.password; // Prevent overwriting password if left blank
 
             // Use the createUser API method to update the user
             const response = await userController.createUser(updatedUser);
@@ -223,16 +221,6 @@ const EditProfilePage: React.FC = () => {
                         fullWidth
                     />
 
-                    {/* Password */}
-                    <TextField
-                        label="Password (Optional)"
-                        name="password"
-                        type="password"
-                        placeholder="Leave blank if not changing"
-                        value={formData.password}
-                        onChange={handleChange}
-                        fullWidth
-                    />
 
                     {/* Save Button */}
                     <Button

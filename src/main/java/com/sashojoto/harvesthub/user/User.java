@@ -1,10 +1,7 @@
 package com.sashojoto.harvesthub.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +18,10 @@ public class User {
     private Long id;
     private String firstName;
     private String lastName;
+    @Column(nullable = false, unique = true) // Ensures no duplicate usernames
     private String username;
+
+    @Column(nullable = false, unique = true) // Ensures no duplicate emails
     private String email;
     private String password;
     private String phoneNumber;

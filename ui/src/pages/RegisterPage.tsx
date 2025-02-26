@@ -26,11 +26,11 @@ const RegisterPage: React.FC = () => {
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("error");
 
-    const usernameInputRef = useRef<HTMLInputElement>(null);
+    const FirstNameInputRef = useRef<HTMLInputElement>(null);
 
     // Set the focus on the username field when the page loads
     useEffect(() => {
-        usernameInputRef.current?.focus();
+        FirstNameInputRef.current?.focus();
     }, []);
 
     // Handle form input changes
@@ -136,11 +136,14 @@ const RegisterPage: React.FC = () => {
                     setSnackbarSeverity("success");
                     setSnackbarOpen(true);
 
-                    setTimeout(() => navigate("/login"), 1500); // Redirect to login after success
+                    setTimeout(() => navigate("/login"), 1500);
                 }
             })
             .catch((error) => {
-                setSnackbarMessage("Registration failed. " + (error.message || "Please try again."));
+                // Display error message from backend
+                const errorMessage =
+                    error.response?.data || "Registration failed. Please try again.";
+                setSnackbarMessage(errorMessage);
                 setSnackbarSeverity("error");
                 setSnackbarOpen(true);
             });
@@ -189,6 +192,7 @@ const RegisterPage: React.FC = () => {
                             label="First Name"
                             name="firstName"
                             type="text"
+                            inputRef={FirstNameInputRef} // Autofocus on the first name field
                             value={formData.firstName}
                             onChange={handleChange}
                             fullWidth
@@ -209,7 +213,6 @@ const RegisterPage: React.FC = () => {
                             label="Username"
                             name="username"
                             type="text"
-                            inputRef={usernameInputRef} // Autofocus on the username field
                             value={formData.username}
                             onChange={handleChange}
                             fullWidth
