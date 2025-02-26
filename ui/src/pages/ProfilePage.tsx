@@ -277,8 +277,6 @@ const Profile: React.FC = () => {
                                     title={product.name!}
                                     price={product.price}
                                     currency={product.currency || "BGN"}
-                                    username={product.ownerName}
-                                    address={product.ownerAddress}
                                 />
                             </Link>
                         ))}
