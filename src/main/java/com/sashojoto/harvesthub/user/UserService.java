@@ -15,26 +15,32 @@ public class UserService {
     private final UserMapper userMapper;
 
     public User createUser(User user) {
-        // Check if username already exists
+        // Check if username already exists (exclude the current user's ID)
         userRepository.findByUsername(user.getUsername())
                 .ifPresent(existing -> {
-                    throw new HarvestHubException("Username is already in use.");
+                    if (!existing.getId().equals(user.getId())) {
+                        throw new HarvestHubException("Username is already in use.");
+                    }
                 });
 
-        // Check if email already exists
+        // Check if email already exists (exclude the current user's ID)
         userRepository.findByEmail(user.getEmail())
                 .ifPresent(existing -> {
-                    throw new HarvestHubException("Email is already in use.");
+                    if (!existing.getId().equals(user.getId())) {
+                        throw new HarvestHubException("Email is already in use.");
+                    }
                 });
 
         // If updating an existing user, retain the existing password
         if (user.getId() != null && user.getId() != -1) {
             User fromDb = userRepository.findById(user.getId())
-                    .orElseThrow(() -> new HarvestHubException("Can't find user for id: " + user.getId()));
+                    .orElseThrow(() ->
+                            new HarvestHubException("Can't find user for id: " + user.getId())
+                    );
             user.setPassword(fromDb.getPassword());
         }
 
-        // Save the new user
+        // Save the user (either new or updated)
         return userRepository.save(user);
     }
 
