@@ -28,6 +28,7 @@ public class Product {
     private Integer quantity;
     private ShippingResponsibility shippingResponsibility;
     private Category category;
+    private String imageUrl;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")

@@ -23,6 +23,7 @@ public class ProductDto {
     private Integer quantity;
     private ShippingResponsibility shippingResponsibility;
     private Category category;
+    private String imageUrl;
 
     private Long userId;
     private String ownerName;
