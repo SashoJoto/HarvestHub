@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +29,11 @@ public class Product {
     private Integer quantity;
     private ShippingResponsibility shippingResponsibility;
     private Category category;
-    private String imageUrl;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images;
+
+    @ManyToMany(mappedBy = "favorites")
+    private List<User> favoritedBy;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")

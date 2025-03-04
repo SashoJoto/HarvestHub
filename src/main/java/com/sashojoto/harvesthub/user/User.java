@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
+import com.sashojoto.harvesthub.product.Product;
 
 @Data
 @AllArgsConstructor
@@ -27,4 +29,13 @@ public class User {
     private String phoneNumber;
     private String address;
     private String description;
+    private String profilePictureUrl;
+
+    @ManyToMany
+    @JoinTable(
+            name = "favorites", // Name of the join table
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private List<Product> favorites;
 }

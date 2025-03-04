@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,10 +20,15 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper mapper;
+    private final ProductImageRepository productImageRepository;
 
-    public Product createProduct(Product product, MultipartFile imageFile) {
+    public Product createProduct(Product product, List<MultipartFile> imageFiles) {
+        // Save product details first
         Product createdProduct = productRepository.save(product);
-        saveProductImage(createdProduct, imageFile);
+
+        // Save images
+        saveProductImages(createdProduct, imageFiles);
+
         return createdProduct;
     }
 
@@ -31,7 +37,8 @@ public class ProductService {
     }
 
     public Product getProduct(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        return productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
     }
 
     public List<Product> searchProducts(String query) {
@@ -42,40 +49,68 @@ public class ProductService {
         // Map your category to enum or database field
         Category categoryEnum = Category.valueOf(category);
 
-        // Fetch products from the repository (assuming ProductRepository exists)
+        // Fetch products from the repository
         List<Product> products = productRepository.findByCategory(categoryEnum);
 
-        // Convert to ProductDto (use a mapper if you have one)
+        // Convert to ProductDto (use the mapper if you have one)
         return products.stream()
-                .map(mapper::toDto) // Assuming you have a mapper
+                .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public String saveProductImage(Product product, MultipartFile imageFile) {
-        String uploadDir = "uploads/";
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs(); // Create directories if they don't exist
-        }
+    public ProductDto getProductDto(Long productId) {
+        // Use repository to find the product
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
 
-        String imagePath = imageFile.getOriginalFilename();
-        File imageFilePath = new File(dir, imagePath);
-        try {
-            FileOutputStream fos = new FileOutputStream(imageFilePath);
-            fos.write(imageFile.getBytes());
-        } catch (IOException e) {
-            throw new HarvestHubException("Failed to save product image", e);
-        }
-
-        String imageUrl = "http://localhost:8080/" + imagePath; // Example: public URL
-        product.setImageUrl(imageUrl);
-        productRepository.save(product);
-
-        return imageUrl;
+        // Map the Product entity to ProductDto using the mapper
+        return mapper.toDto(product);
     }
 
-    public String saveProductImage(Long productId, MultipartFile imageFile) {
+
+    public String saveProductImages(Long productId, List<MultipartFile> imageFiles) {
+        // Find the product by `productId`
         Product product = getProduct(productId);
-        return saveProductImage(product, imageFile);
+
+        // Use the private helper to save images
+        return saveProductImages(product, imageFiles);
+    }
+
+    private String saveProductImages(Product product, List<MultipartFile> imageFiles) {
+        String uploadDir = "uploads/";
+        File dir = new File(uploadDir);
+
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        StringBuilder imageUrls = new StringBuilder();
+
+        for (MultipartFile imageFile : imageFiles) {
+            String uniqueFileName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+            File file = new File(dir, uniqueFileName);
+
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(imageFile.getBytes());
+            } catch (IOException e) {
+                throw new HarvestHubException("Failed to save image: " + uniqueFileName, e);
+            }
+
+            String imageUrl = "http://localhost:8080/uploads/" + uniqueFileName;
+
+            // Save the image details in the database using `ProductImage`
+            ProductImage productImage = new ProductImage();
+            productImage.setImageUrl(imageUrl);
+            productImage.setProduct(product);
+            productImageRepository.save(productImage);
+
+            if (imageUrls.length() > 0) {
+                imageUrls.append(",");
+            }
+            imageUrls.append(imageUrl);
+        }
+
+        // Return all URLs
+        return imageUrls.toString();
     }
 }

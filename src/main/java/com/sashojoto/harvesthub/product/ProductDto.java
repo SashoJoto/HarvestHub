@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,4 +30,6 @@ public class ProductDto {
     private Long userId;
     private String ownerName;
     private String ownerAddress;
+
+    private List<String> imageUrls;
 }

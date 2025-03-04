@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Box, Button, Card, IconButton, Typography} from "@mui/material";
+import {Box, Button, Card, IconButton, Typography, Snackbar, Alert} from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import Navbar from "../components/Navbar";
 import {useNavigate, useParams} from "react-router-dom";
@@ -11,33 +11,73 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ImageUploading, {ImageListType} from "react-images-uploading";
-import {UploadProductImageRequest} from "../api/model/upload-product-image-request.ts";
+// import {UploadProductImageRequest} from "../api/model/upload-product-image-request.ts";
 
 const ProductPage: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const [product, setProduct] = useState<ProductDto | null>(null);
     const [loading, setLoading] = useState(true);
     const [images, setImages] = useState<ImageListType>([]); // State for managing uploaded images
-    const maxNumber = 1; // Allow uploading 1 image at a time
+    const minImages = 2;
+    const maxNumber = 5;
+
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+        "error"
+    );
+
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
 
     const onImageChange = (imageList: ImageListType) => {
-        // Update state when images are uploaded
+        // Update the images state
         setImages(imageList);
-        console.log("Image List:", imageList);
     };
 
     function uploadImages() {
+        if (images.length < minImages || images.length > maxNumber) {
+            setSnackbarMessage("Please upload between 2 and 5 images.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
         const productApi = new ProductControllerApi();
-        const productId:number = product!.id!;
-        productApi.uploadProductImage(productId, images[0].file!)
-            .then((response) => {
-                console.log(response.data);
-                alert("Successfully uploaded images.")
+        const productId: number = product!.id!;
+
+        // Create a new `FormData` object to send files together
+        const formData = new FormData();
+        images.forEach((image) => {
+            if (!image.file) {
+                setSnackbarMessage("Invalid image selected.");
+                setSnackbarSeverity("error");
+                setSnackbarOpen(true);
+                return;
+            }
+            formData.append("images", image.file); // Key must match `@RequestPart("images")` in backend
+        });
+
+        // Make the call to upload images
+        productApi
+            .uploadProductImages(productId, formData as any)
+            .then(() => {
+                // Show success message
+                setSnackbarMessage("Images uploaded successfully!");
+                setSnackbarSeverity("success");
+                setSnackbarOpen(true);
+
+                // Optionally reload the product or reset the images
+                setImages([]);
             })
             .catch((error) => {
                 console.error("Error uploading images:", error);
-                alert("Error uploading images: " + error.message);
+                setSnackbarMessage("Failed to upload images. Please try again.");
+                setSnackbarSeverity("error");
+                setSnackbarOpen(true);
             });
+
     }
 
     useEffect(() => {
@@ -130,27 +170,24 @@ const ProductPage: React.FC = () => {
                     }}
                 >
                     {/* Slick Carousel */}
-                    <Box sx={{width: "100%", marginBottom: 5}}>
-                        {/*{product.images && product.images.length > 0 ? (*/}
-                        {product.imageUrl ? (
+                    <Box sx={{ width: "100%", marginBottom: 5 }}>
+                        {product.imageUrls && product.imageUrls.length > 0 ? (
                             <Slider {...sliderSettings}>
-                                {/*{product.images.map((src, index) => (*/}
-                                {/*    <div key={index}>*/}
-                                <div key="0">
-                                    <img
-                                        src="/uploads/7C2BE22A-EC8A-4D56-BCA3-9EF1EA44E975_.png"
-                                        // alt={`Product Image ${index + 1}`}
-                                        alt={`Product Image`}
-                                        style={{
-                                            width: "100%",
-                                            maxHeight: "400px",
-                                            objectFit: "cover",
-                                            borderRadius: "5px",
-                                            boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
-                                        }}
-                                    />
-                                </div>
-                                {/*))}*/}
+                                {product.imageUrls.map((url, index) => (
+                                    <div key={index}>
+                                        <img
+                                            src={url}
+                                            alt={`Product Image ${index + 1}`}
+                                            style={{
+                                                width: "100%",
+                                                maxHeight: "400px",
+                                                objectFit: "cover",
+                                                borderRadius: "5px",
+                                                boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+                                            }}
+                                        />
+                                    </div>
+                                ))}
                             </Slider>
                         ) : (
                             <Typography
@@ -162,127 +199,27 @@ const ProductPage: React.FC = () => {
                                 }}
                             >
                                 No images available.
-                                <Box sx={{ marginBottom: 3 }}>
-                                    <ImageUploading
-                                        value={images}
-                                        onChange={onImageChange}
-                                        maxNumber={maxNumber}
-                                        dataURLKey="data_url"
-                                        acceptType={["jpg", "png", "jpeg"]} // Accept only specific image types
-                                    >
-                                        {({
-                                              imageList,
-                                              onImageUpload,
-                                              onImageRemoveAll,
-                                              onImageRemove,
-                                              isDragging,
-                                              dragProps,
-                                          }) => (
-                                            // Wrapper box for styling
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    flexDirection: "column",
-                                                    alignItems: "center",
-                                                    gap: 2,
-                                                    border: "2px dashed #ccc",
-                                                    padding: 3,
-                                                    borderRadius: 5,
-                                                    cursor: isDragging ? "pointer" : "default",
-                                                    backgroundColor: isDragging ? "#f7f7f7" : "transparent",
-                                                }}
-                                                {...dragProps}
-                                            >
-                                                {/* Upload Button */}
-                                                <Button
-                                                    variant="outlined"
-                                                    onClick={onImageUpload} // Trigger the upload dialog
-                                                    sx={{ color: "purple", borderColor: "purple" }}
-                                                >
-                                                    Click or Drag to Upload
-                                                </Button>
-
-                                                {/* Remove All Button */}
-                                                {imageList.length > 0 && (
-                                                    <Button
-                                                        variant="contained"
-                                                        color="error"
-                                                        onClick={onImageRemoveAll} // Remove all uploaded images
-                                                    >
-                                                        Remove All
-                                                    </Button>
-                                                )}
-
-                                                {/* Image Preview Section */}
-                                                <Box
-                                                    sx={{
-                                                        display: "flex",
-                                                        gap: 2,
-                                                        flexWrap: "wrap",
-                                                        justifyContent: "center",
-                                                        marginTop: 2,
-                                                    }}
-                                                >
-                                                    {imageList.map((image, index) => (
-                                                        <Box key={index} sx={{ position: "relative", width: 150 }}>
-                                                            {/* Image Preview */}
-                                                            <img
-                                                                src={image["data_url"]}
-                                                                alt={`Uploaded Preview ${index + 1}`}
-                                                                style={{
-                                                                    width: "100%",
-                                                                    height: "100%",
-                                                                    objectFit: "cover",
-                                                                    borderRadius: 5,
-                                                                    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
-                                                                }}
-                                                            />
-                                                            {/* Remove Button */}
-                                                            <Button
-                                                                size="small"
-                                                                variant="contained"
-                                                                color="error"
-                                                                onClick={() => onImageRemove(index)}
-                                                                sx={{
-                                                                    position: "absolute",
-                                                                    top: 5,
-                                                                    right: 5,
-                                                                    minWidth: "30px",
-                                                                    minHeight: "30px",
-                                                                    padding: 0,
-                                                                }}
-                                                            >
-                                                                &times;
-                                                            </Button>
-                                                        </Box>
-                                                    ))}
-                                                </Box>
-                                            </Box>
-                                        )}
-                                    </ImageUploading>
-                                </Box>
-                                {/* Submit Button for Upload Form */}
-                                <Button
-                                    variant="contained"
-                                    sx={{
-                                        backgroundColor: "purple",
-                                        color: "white",
-                                        fontWeight: "bold",
-                                        fontSize: "18px",
-                                        padding: "10px 20px",
-                                        textTransform: "none",
-                                        "&:hover": {
-                                            backgroundColor: "darkviolet",
-                                        },
-                                    }}
-                                    onClick={uploadImages}
-                                >
-                                    Submit Images
-                                </Button>
-
                             </Typography>
                         )}
                     </Box>
+                    {/* Snackbar for feedback */}
+                    <Snackbar
+                        open={snackbarOpen}
+                        autoHideDuration={5000}
+                        onClose={handleSnackbarClose}
+                        anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "center",
+                        }}
+                    >
+                        <Alert
+                            onClose={handleSnackbarClose}
+                            severity={snackbarSeverity}
+                            sx={{ width: "100%" }}
+                        >
+                            {snackbarMessage}
+                        </Alert>
+                    </Snackbar>
 
                     {/* Name, Price, and Favorite Icon */}
                     <Box

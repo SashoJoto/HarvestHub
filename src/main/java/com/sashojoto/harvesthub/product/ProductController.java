@@ -2,11 +2,8 @@ package com.sashojoto.harvesthub.product;
 
 import com.sashojoto.harvesthub.user.User;
 import com.sashojoto.harvesthub.user.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collections;
 import java.util.List;
 
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
-
-@RestController(value = "/api/product")
+@RestController
+@RequestMapping("/api/product")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -25,49 +21,83 @@ public class ProductController {
     private final ProductMapper mapper;
     private final UserService userService;
 
+    /**
+     * Get product details by ID (Including its images)
+     */
     @GetMapping("/{id}")
-    public ProductDto getProduct(@PathVariable Long id) {
-        Product product = productService.getProduct(id);
-        return mapper.toDto(product);
+    public ResponseEntity<ProductDto> getProduct(@PathVariable Long id) {
+        try {
+            ProductDto productDto = productService.getProductDto(id);
+            return ResponseEntity.ok(productDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
+    /**
+     * Create a new product with its images
+     */
     @PostMapping("/create")
-    public ProductDto createProduct(@RequestBody ProductDto productDto,
-                                    @RequestParam("image") MultipartFile imageFile,
-                                    @AuthenticationPrincipal User principal) {
-        Product product = mapper.toProduct(productDto);
-        User user = userService.getUserById(principal.getId());
-        product.setOwner(user);
+    public ResponseEntity<ProductDto> createProduct(
+            @RequestBody ProductDto productDto,
+            @RequestParam("image") List<MultipartFile> imageFiles,
+            @AuthenticationPrincipal User principal
+    ) {
+        try {
+            Product product = mapper.toProduct(productDto);
+            User user = userService.getUserById(principal.getId());
+            product.setOwner(user);
 
-        Product productCreated = productService.createProduct(product, imageFile);
-
-        return mapper.toDto(productCreated);
+            Product createdProduct = productService.createProduct(product, imageFiles);
+            return ResponseEntity.ok(mapper.toDto(createdProduct));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    // New endpoint to fetch all products
+    /**
+     * Get all products for the authenticated user
+     */
     @GetMapping("/all")
-    public List<ProductDto> getAllProducts(@AuthenticationPrincipal User principal) {
-        User user = userService.getUserById(principal.getId());
-        List<Product> products = productService.getAllProducts(user);
+    public ResponseEntity<List<ProductDto>> getAllProducts(@AuthenticationPrincipal User principal) {
+        try {
+            User user = userService.getUserById(principal.getId());
+            List<Product> products = productService.getAllProducts(user);
 
-        // Map products to DTOs
-        return products.stream()
-                .map(mapper::toDto)
-                .toList();
+            List<ProductDto> productDtos = products.stream()
+                    .map(mapper::toDto)
+                    .toList();
+
+            return ResponseEntity.ok(productDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
+    /**
+     * Search for products by a query string
+     */
     @GetMapping("/search")
-    public List<ProductDto> searchProducts(@RequestParam String query) {
-        List<Product> products = productService.searchProducts(query);
-        return products.stream()
-                .map(mapper::toDto) // Map Product entities to DTOs
-                .toList();
+    public ResponseEntity<List<ProductDto>> searchProducts(@RequestParam String query) {
+        try {
+            List<Product> products = productService.searchProducts(query);
+
+            List<ProductDto> productDtos = products.stream()
+                    .map(mapper::toDto)
+                    .toList();
+
+            return ResponseEntity.ok(productDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
+    /**
+     * Get products by category
+     */
     @GetMapping("/by-category")
     public ResponseEntity<List<ProductDto>> getProductsByCategory(@RequestParam String category) {
         try {
-            // Fetch products based on category (map enums to your categories)
             List<ProductDto> products = productService.getProductsByCategory(category);
             return ResponseEntity.ok(products);
         } catch (Exception e) {
@@ -76,15 +106,21 @@ public class ProductController {
         }
     }
 
-
-    @PostMapping(path = "/{productId}/image",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadProductImage(
+    /**
+     * Upload images for a specific product
+     */
+    @PostMapping("/{productId}/images")
+    public ResponseEntity<String> uploadProductImages(
             @PathVariable Long productId,
-            @RequestPart("image") MultipartFile imageFile) {
-
-        String imageUrl = productService.saveProductImage(productId, imageFile);
-
-        return ResponseEntity.ok(imageUrl);
+            @RequestPart("images") List<MultipartFile> imageFiles
+    ) {
+        try {
+            String imageUrls = productService.saveProductImages(productId, imageFiles);
+            return ResponseEntity.ok("Images uploaded successfully! URLs: " + imageUrls);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

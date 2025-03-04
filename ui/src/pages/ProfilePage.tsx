@@ -269,7 +269,7 @@ const Profile: React.FC = () => {
                     >
                         {products.map((product) => (
                             <Link
-                                to={`/product/${product.id}`} // Dynamic link to product page
+                                to={`/product/${product.id}`}
                                 key={product.id}
                                 style={{ textDecoration: "none" }}
                             >

@@ -40,6 +40,9 @@ const AddProduct: React.FC = () => {
         price: false,
     });
 
+    // Image upload state
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
+
     // Snackbar state
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -62,6 +65,14 @@ const AddProduct: React.FC = () => {
                 ...errors,
                 [name]: Number(value) <= 0,
             });
+        }
+    };
+
+    // Handle image file selection
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            setImageFiles(files);
         }
     };
 
@@ -103,7 +114,7 @@ const AddProduct: React.FC = () => {
             return;
         }
 
-        // If validation passes, construct product DTO and proceed with API call
+        // If validation passes, construct product DTO and FormData
         const productDto: ProductDto = {
             name: formValues.productName,
             description: formValues.description,
@@ -115,14 +126,22 @@ const AddProduct: React.FC = () => {
             category: formValues.category,
         };
 
+        // Initialize FormData for file upload
+        const formData = new FormData();
+        formData.append("product", new Blob([JSON.stringify(productDto)], { type: "application/json" }));
+        imageFiles.forEach((file, index) => {
+            formData.append("images", file); // "images" corresponds to backend request's field name
+        });
+
         const productApi = new ProductControllerApi();
         productApi
-            .createProduct(productDto)
+            .createProduct(formData, { headers: { "Content-Type": "multipart/form-data" } }) // Ensure proper headers
             .then((response) => {
                 console.log(response.data);
                 setSnackbarMessage("Product added successfully!");
                 setSnackbarSeverity("success");
                 setSnackbarOpen(true); // Show success message
+                setImageFiles([]); // Reset selected images
             })
             .catch((error) => {
                 console.error(error);
@@ -288,6 +307,25 @@ const AddProduct: React.FC = () => {
                             </ToggleButton>
                         </ToggleButtonGroup>
                     </Box>
+
+                    {/* Image Upload */}
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <Button variant="contained" component="label">
+                            Upload Images
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                hidden
+                                onChange={handleFileChange}
+                            />
+                        </Button>
+                        {imageFiles.length > 0 && (
+                            <Typography variant="subtitle2" sx={{ mt: 1 }}>
+                                {imageFiles.map((file) => file.name).join(", ")}
+                            </Typography>
+                        )}
+                    </FormControl>
 
                     {/* Submit Button */}
                     <Button
