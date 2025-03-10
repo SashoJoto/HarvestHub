@@ -21,14 +21,13 @@ public interface ProductMapper {
 
     Product toProduct(ProductDto productDto);
 
-    // Custom mapping method for images
     @Named("mapImagesToUrls")
     static List<String> mapImagesToUrls(List<ProductImage> images) {
         if (images == null) {
             return null;
         }
         return images.stream()
-                .map(ProductImage::getImageUrl) // Use getImageUrl for the correct field
+                .map(ProductImage::getImageUrl)
                 .collect(Collectors.toList());
     }
 

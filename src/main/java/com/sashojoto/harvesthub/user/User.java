@@ -20,10 +20,10 @@ public class User {
     private Long id;
     private String firstName;
     private String lastName;
-    @Column(nullable = false, unique = true) // Ensures no duplicate usernames
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false, unique = true) // Ensures no duplicate emails
+    @Column(nullable = false, unique = true)
     private String email;
     private String password;
     private String phoneNumber;
@@ -33,7 +33,7 @@ public class User {
 
     @ManyToMany
     @JoinTable(
-            name = "favorites", // Name of the join table
+            name = "favorites",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )

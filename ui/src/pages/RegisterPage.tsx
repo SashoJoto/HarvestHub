@@ -8,7 +8,6 @@ const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
     const [isRegistered, setIsRegistered] = useState(false);
 
-    // Form state for registration
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -21,24 +20,20 @@ const RegisterPage: React.FC = () => {
         confirmPassword: "",
     });
 
-    // Snackbar state
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("error");
 
     const FirstNameInputRef = useRef<HTMLInputElement>(null);
 
-    // Set the focus on the username field when the page loads
     useEffect(() => {
         FirstNameInputRef.current?.focus();
     }, []);
 
-    // Handle form input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
         if (name === "phoneNumber") {
-            // Ensure phoneNumber always starts with +359
             const newValue = value.startsWith("+359") ? value : `+359${value.replace(/^\+?359/, "")}`;
             setFormData((prev) => ({ ...prev, phoneNumber: newValue }));
         } else {
@@ -46,14 +41,12 @@ const RegisterPage: React.FC = () => {
         }
     };
 
-    // Snackbar handlers
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
     };
 
-    // Handle registration form submission
     const register = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault(); // Prevent page reload
+        event.preventDefault();
         const {
             firstName,
             lastName,
@@ -64,7 +57,6 @@ const RegisterPage: React.FC = () => {
             confirmPassword,
         } = formData;
 
-        // Custom validation
         if (!firstName) {
             setSnackbarMessage("Please provide your first name.");
             setSnackbarSeverity("error");
@@ -114,7 +106,6 @@ const RegisterPage: React.FC = () => {
             return;
         }
 
-        // API call to register
         const userController = new UserControllerApi();
         const user: User = {
             firstName,
@@ -140,7 +131,6 @@ const RegisterPage: React.FC = () => {
                 }
             })
             .catch((error) => {
-                // Display error message from backend
                 const errorMessage =
                     error.response?.data || "Registration failed. Please try again.";
                 setSnackbarMessage(errorMessage);
@@ -151,7 +141,6 @@ const RegisterPage: React.FC = () => {
 
     return (
         <>
-            {/* Navbar */}
             <Navbar />
 
             {!isRegistered ? (

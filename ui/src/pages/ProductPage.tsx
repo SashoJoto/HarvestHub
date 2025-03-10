@@ -10,75 +10,29 @@ import {ProductControllerApi, ProductDto, ProductDtoCurrencyEnum} from "../api";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import ImageUploading, {ImageListType} from "react-images-uploading";
 // import {UploadProductImageRequest} from "../api/model/upload-product-image-request.ts";
 
 const ProductPage: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const [product, setProduct] = useState<ProductDto | null>(null);
     const [loading, setLoading] = useState(true);
-    const [images, setImages] = useState<ImageListType>([]); // State for managing uploaded images
-    const minImages = 2;
-    const maxNumber = 5;
 
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState("");
-    const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-        "error"
-    );
+    // const [snackbarOpen, setSnackbarOpen] = useState(false);
+    //
+    // const handleSnackbarClose = () => {
+    //     setSnackbarOpen(false);
+    // };
+    //
+    // const initiateChatWithSeller = (sellerName: string, productId: number) => {
+    //     console.log(`Attempting to start a chat with seller: ${sellerName} for product ID: ${productId}...`);
+    //
+    //     // connectToChatService();
+    //
+    //     // const chatRoomId = createNewChatRoom(productId);
+    //
+    //     // sendMessageToChat(chatRoomId, `Hello, I am interested in your product (ID: ${productId}).`);
+    // };
 
-    const handleSnackbarClose = () => {
-        setSnackbarOpen(false);
-    };
-
-    const onImageChange = (imageList: ImageListType) => {
-        // Update the images state
-        setImages(imageList);
-    };
-
-    function uploadImages() {
-        if (images.length < minImages || images.length > maxNumber) {
-            setSnackbarMessage("Please upload between 2 and 5 images.");
-            setSnackbarSeverity("error");
-            setSnackbarOpen(true);
-            return;
-        }
-
-        const productApi = new ProductControllerApi();
-        const productId: number = product!.id!;
-
-        // Create a new `FormData` object to send files together
-        const formData = new FormData();
-        images.forEach((image) => {
-            if (!image.file) {
-                setSnackbarMessage("Invalid image selected.");
-                setSnackbarSeverity("error");
-                setSnackbarOpen(true);
-                return;
-            }
-            formData.append("images", image.file); // Key must match `@RequestPart("images")` in backend
-        });
-
-        // Make the call to upload images
-        productApi
-            .uploadProductImages(productId, formData as any)
-            .then(() => {
-                // Show success message
-                setSnackbarMessage("Images uploaded successfully!");
-                setSnackbarSeverity("success");
-                setSnackbarOpen(true);
-
-                // Optionally reload the product or reset the images
-                setImages([]);
-            })
-            .catch((error) => {
-                console.error("Error uploading images:", error);
-                setSnackbarMessage("Failed to upload images. Please try again.");
-                setSnackbarSeverity("error");
-                setSnackbarOpen(true);
-            });
-
-    }
 
     useEffect(() => {
         const fetchProductDetails = async () => {
@@ -202,24 +156,6 @@ const ProductPage: React.FC = () => {
                             </Typography>
                         )}
                     </Box>
-                    {/* Snackbar for feedback */}
-                    <Snackbar
-                        open={snackbarOpen}
-                        autoHideDuration={5000}
-                        onClose={handleSnackbarClose}
-                        anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "center",
-                        }}
-                    >
-                        <Alert
-                            onClose={handleSnackbarClose}
-                            severity={snackbarSeverity}
-                            sx={{ width: "100%" }}
-                        >
-                            {snackbarMessage}
-                        </Alert>
-                    </Snackbar>
 
                     {/* Name, Price, and Favorite Icon */}
                     <Box
@@ -373,7 +309,7 @@ const ProductPage: React.FC = () => {
                                     backgroundColor: "darkviolet",
                                 },
                             }}
-                            onClick={() => alert("Messaging the seller...")}
+                            // onClick={() => initiateChatWithSeller(product.ownerName)}
                         >
                             Message Seller
                         </Button>

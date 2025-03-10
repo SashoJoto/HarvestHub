@@ -4,44 +4,44 @@ import "slick-carousel/slick/slick-theme.css";
 const theme = createTheme({
     palette: {
         primary: {
-            main: "rgb(50,66,60)", // Navbar color
+            main: "rgb(50,66,60)",
         },
         background: {
-            default: "rgb(78,104,90)", // Page background color
-            paper: "rgb(34,47,50)",    // Blocks and UI elements like cards
+            default: "rgb(78,104,90)",
+            paper: "rgb(34,47,50)",
         },
         text: {
-            primary: "#FFFFFF",        // Default text color
-            secondary: "rgb(69,237,130)", // Special or selected text
+            primary: "#FFFFFF",
+            secondary: "rgb(69,237,130)",
         },
     },
     typography: {
         allVariants: {
-            color: "#FFFFFF", // Ensure text is globally white as a base
+            color: "#FFFFFF",
         },
     },
     components: {
         MuiButton: {
             styleOverrides: {
                 root: {
-                    textTransform: "none", // Avoid default uppercase for buttons
-                    color: "#FFFFFF",       // Default text color for buttons
+                    textTransform: "none",
+                    color: "#FFFFFF",
                 },
             },
         },
         MuiAppBar: {
             styleOverrides: {
                 root: {
-                    backgroundColor: "rgb(50,66,60)", // Navbar default color
+                    backgroundColor: "rgb(50,66,60)",
                 },
             },
         },
         MuiCard: {
             styleOverrides: {
                 root: {
-                    backgroundColor: "rgb(34,47,50)", // Blocks for categories or UI elements
-                    color: "#FFFFFF",                // Text inside blocks
-                    borderRadius: "8px",             // Optional: Rounded corners
+                    backgroundColor: "rgb(34,47,50)",
+                    color: "#FFFFFF",
+                    borderRadius: "8px",
                 },
             },
         },

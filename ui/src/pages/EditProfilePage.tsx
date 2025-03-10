@@ -9,26 +9,21 @@ const EditProfilePage: React.FC = () => {
     const navigate = useNavigate();
     const userController = new UserControllerApi();
 
-    // Retrieve the current user data from the passed state
     const currentUser: UserDto = location.state.user;
 
-    // State to manage form data
     const [formData, setFormData] = useState<UserDto>({
         ...currentUser,
         phoneNumber: currentUser.phoneNumber || "+359", // Ensure +359 is set by default for phone numbers
     });
 
-    // Snackbar state management
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("error");
 
-    // Handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
         if (name === "phoneNumber") {
-            // Ensure phoneNumber starts with +359
             const newValue = value.startsWith("+359") ? value : `+359${value.replace(/^\+?359/, "")}`;
             setFormData((prev) => ({ ...prev, phoneNumber: newValue }));
         } else {
@@ -36,12 +31,10 @@ const EditProfilePage: React.FC = () => {
         }
     };
 
-    // Snackbar close handler
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
     };
 
-    // Function to validate form before submission
     const validateForm = (): boolean => {
         const { firstName, lastName, email, phoneNumber } = formData;
 
@@ -73,21 +66,18 @@ const EditProfilePage: React.FC = () => {
             return false;
         }
 
-        return true; // Validation passed
+        return true;
     };
 
-    // Handle form submission
     const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (!validateForm()) return; // Perform validation and stop execution if it fails
+        if (!validateForm()) return;
 
         try {
-            // Fetch the current user to merge the old data with the newly updated fields
             const updatedUser: UserDto = { ...currentUser, ...formData };
 
 
-            // Use the createUser API method to update the user
             const response = await userController.createUser(updatedUser);
 
             if (response.status === 200 || response.status === 201) {
@@ -95,7 +85,6 @@ const EditProfilePage: React.FC = () => {
                 setSnackbarSeverity("success");
                 setSnackbarOpen(true);
 
-                // Redirect to the profile page after success
                 setTimeout(() => navigate("/profile"), 1500);
             }
         } catch (error) {

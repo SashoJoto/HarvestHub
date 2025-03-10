@@ -28,7 +28,6 @@ public class UserService {
     private final ProductMapper mapper;
 
     public User createUser(User user) {
-        // Check if username already exists (exclude the current user's ID)
         userRepository.findByUsername(user.getUsername())
                 .ifPresent(existing -> {
                     if (!existing.getId().equals(user.getId())) {
@@ -36,7 +35,6 @@ public class UserService {
                     }
                 });
 
-        // Check if email already exists (exclude the current user's ID)
         userRepository.findByEmail(user.getEmail())
                 .ifPresent(existing -> {
                     if (!existing.getId().equals(user.getId())) {
@@ -44,7 +42,6 @@ public class UserService {
                     }
                 });
 
-        // If updating an existing user, retain the existing password
         if (user.getId() != null && user.getId() != -1) {
             User fromDb = userRepository.findById(user.getId())
                     .orElseThrow(() ->
@@ -53,7 +50,6 @@ public class UserService {
             user.setPassword(fromDb.getPassword());
         }
 
-        // Save the user (either new or updated)
         return userRepository.save(user);
     }
 
@@ -65,13 +61,11 @@ public class UserService {
     }
 
     public User login(LoginRequest loginRequest) {
-        // Look up users by username and password
         List<User> users = userRepository.findByUsernameAndPassword(
                 loginRequest.getUsername(),
                 loginRequest.getPassword()
         );
 
-        // Ensure exactly one user is found
         if (users.isEmpty() || users.size() != 1) {
             return null;
         }
@@ -80,34 +74,33 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        // Find user by ID with exception if not found
         return userRepository.findById(id)
                 .orElseThrow(() -> new HarvestHubException("Can't find user for id: " + id));
     }
 
     public String saveProfilePicture(Long userId, MultipartFile imageFile) {
-        User user = getUserById(userId); // Retrieve user by ID
+        User user = getUserById(userId);
 
         String uploadDir = "uploads/profile_pictures/";
         File dir = new File(uploadDir);
         if (!dir.exists()) {
-            dir.mkdirs(); // Create directory if it doesn't exist
+            dir.mkdirs();
         }
 
-        String imagePath = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename(); // Unique file name
+        String imagePath = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
         File imageFilePath = new File(dir, imagePath);
 
         try (FileOutputStream fos = new FileOutputStream(imageFilePath)) {
-            fos.write(imageFile.getBytes()); // Write the file bytes
+            fos.write(imageFile.getBytes());
         } catch (IOException e) {
             throw new HarvestHubException("Failed to save profile picture", e);
         }
 
-        String imageUrl = "http://localhost:8080/profile_pictures/" + imagePath; // Construct public URL
-        user.setProfilePictureUrl(imageUrl); // Save the URL in the user's profile
-        userRepository.save(user); // Update the user record in the database
+        String imageUrl = "http://localhost:8080/profile_pictures/" + imagePath;
+        user.setProfilePictureUrl(imageUrl);
+        userRepository.save(user);
 
-        return imageUrl; // Return the URL for confirmation
+        return imageUrl;
     }
 
     public void addFavorites(Long userId, Long productId) {
@@ -116,7 +109,7 @@ public class UserService {
                 .orElseThrow(() -> new HarvestHubException("Product not found"));
         if (!user.getFavorites().contains(product)) {
             user.getFavorites().add(product);
-            userRepository.save(user); // Save the updated user entity
+            userRepository.save(user);
         }
 
     }
@@ -129,7 +122,7 @@ public class UserService {
 
         if (user.getFavorites().contains(product)) {
             user.getFavorites().remove(product);
-            userRepository.save(user); // Save the updated user entity
+            userRepository.save(user);
         }
 
     }
@@ -138,7 +131,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new HarvestHubException("User not found"));
 
-        // Convert favorite products to DTOs
         return user.getFavorites().stream()
                 .map(product -> mapper.toDto(product))
                 .collect(Collectors.toList());

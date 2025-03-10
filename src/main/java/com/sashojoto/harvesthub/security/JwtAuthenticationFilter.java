@@ -29,13 +29,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        // Check if the Authorization header contains a Bearer token
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             if (jwtTokenUtil.validateToken(token)) {
                 String userId = jwtTokenUtil.getUsernameFromToken(token);
 
-                // Create authentication object and set it in the security context
                 User user = new User();
                 user.setId(Long.valueOf(userId));
                 UsernamePasswordAuthenticationToken authentication =
@@ -43,15 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 user,
                                 null,
                                 List.of(
-                                        new SimpleGrantedAuthority("ROLE_USER"),  // Example role
-                                        new SimpleGrantedAuthority("READ_PRIVILEGES") // Example custom authority
+                                        new SimpleGrantedAuthority("ROLE_USER"),
+                                        new SimpleGrantedAuthority("READ_PRIVILEGES")
                                 ));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
 
-        // Continue with the filter chain
         filterChain.doFilter(request, response);
     }
 }

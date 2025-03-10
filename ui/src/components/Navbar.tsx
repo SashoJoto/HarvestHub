@@ -15,12 +15,10 @@ import { Link } from "react-router-dom";
 const Navbar: React.FC = () => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-    // Open the dropdown menu
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
 
-    // Close the dropdown menu
     const handleMenuClose = () => {
         setAnchorEl(null);
     };
@@ -32,14 +30,13 @@ const Navbar: React.FC = () => {
                     padding: { xs: "0 8px", sm: "0 16px" }, // Minimize side padding for very small screens
                 }}
             >
-                {/* Menu Icon: Visible only on small or extra small screens */}
                 <IconButton
                     edge="start"
                     color="inherit"
                     aria-label="menu"
                     sx={{
                         mr: 1,
-                        display: { xs: "block", md: "none" }, // Show on xs/sm screens, hide on md+
+                        display: { xs: "block", md: "none" },
                     }}
                     onClick={handleMenuOpen}
                 >
@@ -61,11 +58,10 @@ const Navbar: React.FC = () => {
                     HarvestHub
                 </Typography>
 
-                {/* Dropdown Menu (for MenuIcon): Visible on smaller screens */}
                 <Menu
                     anchorEl={anchorEl}
-                    open={Boolean(anchorEl)} // Open when MenuIcon is clicked
-                    onClose={handleMenuClose} // Close menu
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
                     anchorOrigin={{
                         vertical: "bottom",
                         horizontal: "left",
@@ -75,12 +71,11 @@ const Navbar: React.FC = () => {
                         horizontal: "left",
                     }}
                 >
-                    {/* Dropdown menu items */}
 
                     <MenuItem
-                        component={Link} // Use Link for navigation
-                        to="/favorites" // URL to navigate to
-                        onClick={handleMenuClose} // Close the menu after navigation
+                        component={Link}
+                        to="/favorites"
+                        onClick={handleMenuClose}
                     >
                         <Favorite sx={{ mr: 1 }} /> Favorites
                     </MenuItem>
@@ -107,11 +102,10 @@ const Navbar: React.FC = () => {
                     </MenuItem>
                 </Menu>
 
-                {/* Buttons Section: Visible only on medium to larger screens */}
                 <Box
                     sx={{
-                        display: { xs: "none", md: "flex" }, // Hide on xs/sm screens, visible on md+
-                        gap: 1.5, // Slightly reduced spacing for buttons
+                        display: { xs: "none", md: "flex" },
+                        gap: 1.5,
                     }}
                 >
                     <IconButton

@@ -24,17 +24,15 @@ public class JwtTokenUtil {
     private static final long EXPIRATION_TIME = 3600000; // 1 hour in milliseconds
     private final UserService userService;
 
-    // Generate JWT Token
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getId().toString())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) //Валидност: 1час
                 .signWith(SECRET_KEY)
                 .compact();
     }
 
-    // Validate JWT Token
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
@@ -43,7 +41,7 @@ public class JwtTokenUtil {
                     .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            return false; // Invalid or expired token
+            return false;
         }
     }
 

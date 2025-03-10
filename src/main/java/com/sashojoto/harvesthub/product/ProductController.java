@@ -21,9 +21,6 @@ public class ProductController {
     private final ProductMapper mapper;
     private final UserService userService;
 
-    /**
-     * Get product details by ID (Including its images)
-     */
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getProduct(@PathVariable Long id) {
         try {
@@ -34,9 +31,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Create a new product with its images
-     */
     @PostMapping("/create")
     public ResponseEntity<ProductDto> createProduct(
             @RequestBody ProductDto productDto,
@@ -55,9 +49,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Get all products for the authenticated user
-     */
     @GetMapping("/all")
     public ResponseEntity<List<ProductDto>> getAllProducts(@AuthenticationPrincipal User principal) {
         try {
@@ -74,9 +65,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Search for products by a query string
-     */
     @GetMapping("/search")
     public ResponseEntity<List<ProductDto>> searchProducts(@RequestParam String query) {
         try {
@@ -92,9 +80,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Get products by category
-     */
     @GetMapping("/by-category")
     public ResponseEntity<List<ProductDto>> getProductsByCategory(@RequestParam String category) {
         try {
@@ -106,9 +91,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Upload images for a specific product
-     */
     @PostMapping("/{productId}/images")
     public ResponseEntity<String> uploadProductImages(
             @PathVariable Long productId,

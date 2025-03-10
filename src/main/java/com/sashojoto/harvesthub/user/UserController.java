@@ -38,7 +38,6 @@ public class UserController {
             @PathVariable Long userId,
             @RequestPart("image") MultipartFile imageFile) {
 
-        // Save the profile picture using the UserService
         String imageUrl = userService.saveProfilePicture(userId, imageFile);
 
         return ResponseEntity.ok(imageUrl); // Return the image URL

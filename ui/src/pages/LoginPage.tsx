@@ -18,13 +18,12 @@ const LoginPage: React.FC = () => {
 
     const UsernameInputRef = useRef<HTMLInputElement>(null);
 
-    // Snackbar state
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("error");
 
     useEffect(() => {
-        UsernameInputRef.current?.focus(); // Focus on the email input
+        UsernameInputRef.current?.focus();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,12 +31,10 @@ const LoginPage: React.FC = () => {
         setCredentials((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Snackbar handlers
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
     };
 
-    // Simulate login action
     const login = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const authentication: AuthControllerApi = new AuthControllerApi();
@@ -55,12 +52,10 @@ const LoginPage: React.FC = () => {
                         localStorage.setItem("jwtToken", token);
                     }
 
-                    // Immediately navigate to the home page
                     navigate("/");
                 }
             })
             .catch((error) => {
-                // Show error snackbar
                 setSnackbarMessage(
                     "Invalid credentials. Please try again. " + error.message
                 );
@@ -164,10 +159,9 @@ const LoginPage: React.FC = () => {
                 </Box>
             )}
 
-            {/* Snackbar for error messages */}
             <Snackbar
                 open={snackbarOpen}
-                autoHideDuration={5000} // Automatically closes after 5 seconds
+                autoHideDuration={5000}
                 onClose={handleSnackbarClose}
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}
             >

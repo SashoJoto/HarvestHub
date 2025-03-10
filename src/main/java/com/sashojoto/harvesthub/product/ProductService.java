@@ -23,10 +23,8 @@ public class ProductService {
     private final ProductImageRepository productImageRepository;
 
     public Product createProduct(Product product, List<MultipartFile> imageFiles) {
-        // Save product details first
         Product createdProduct = productRepository.save(product);
 
-        // Save images
         saveProductImages(createdProduct, imageFiles);
 
         return createdProduct;
@@ -46,33 +44,26 @@ public class ProductService {
     }
 
     public List<ProductDto> getProductsByCategory(String category) {
-        // Map your category to enum or database field
         Category categoryEnum = Category.valueOf(category);
 
-        // Fetch products from the repository
         List<Product> products = productRepository.findByCategory(categoryEnum);
 
-        // Convert to ProductDto (use the mapper if you have one)
         return products.stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public ProductDto getProductDto(Long productId) {
-        // Use repository to find the product
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
 
-        // Map the Product entity to ProductDto using the mapper
         return mapper.toDto(product);
     }
 
 
     public String saveProductImages(Long productId, List<MultipartFile> imageFiles) {
-        // Find the product by `productId`
         Product product = getProduct(productId);
 
-        // Use the private helper to save images
         return saveProductImages(product, imageFiles);
     }
 
@@ -98,7 +89,6 @@ public class ProductService {
 
             String imageUrl = "http://localhost:8080/uploads/" + uniqueFileName;
 
-            // Save the image details in the database using `ProductImage`
             ProductImage productImage = new ProductImage();
             productImage.setImageUrl(imageUrl);
             productImage.setProduct(product);
@@ -110,7 +100,6 @@ public class ProductService {
             imageUrls.append(imageUrl);
         }
 
-        // Return all URLs
         return imageUrls.toString();
     }
 }

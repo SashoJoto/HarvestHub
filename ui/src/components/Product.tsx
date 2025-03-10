@@ -5,7 +5,7 @@ import {
     IconButton,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite"; // Filled heart icon
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { UserControllerApi } from "../api";
 import { jwtDecode } from "jwt-decode";
 
@@ -16,8 +16,8 @@ interface ProductProps {
     currency: "USD" | "GBP" | "BGN" | "EUR";
     username: string;
     address: string;
-    isFavorited: boolean; // Indicates if the product is already a favorite
-    onFavoriteToggle: (id: number, isFavorited: boolean) => void; // Callback for parent to handle state change
+    isFavorited: boolean;
+    onFavoriteToggle: (id: number, isFavorited: boolean) => void;
 }
 
 const Product: React.FC<ProductProps> = ({
@@ -49,7 +49,7 @@ const Product: React.FC<ProductProps> = ({
     };
 
     const handleFavoriteClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.stopPropagation(); // Prevent redirect on click
+        event.stopPropagation();
 
         const jwtToken: string | null = localStorage.getItem("jwtToken");
         if (!jwtToken) {
@@ -58,18 +58,15 @@ const Product: React.FC<ProductProps> = ({
         }
 
         const jwtDecoded: any = jwtDecode<string>(jwtToken || "");
-        const userId: string = jwtDecoded.sub; // Decode the user ID from the JWT token
+        const userId: string = jwtDecoded.sub;
 
         try {
             if (favorite) {
-                // Remove from favorites
-                await userControllerApi.removeFavorite(id, Number(userId)); // Pass both product ID and user ID
+                await userControllerApi.removeFavorite(id, Number(userId));
             } else {
-                // Add to favorites
-                await userControllerApi.addFavorite(id, Number(userId)); // Pass both product ID and user ID
+                await userControllerApi.addFavorite(id, Number(userId));
             }
 
-            // Update local and parent state
             setFavorite(!favorite);
             onFavoriteToggle(id, !favorite);
         } catch (error) {
@@ -123,7 +120,7 @@ const Product: React.FC<ProductProps> = ({
                     sx={{ color: "secondary.main" }}
                     onClick={handleFavoriteClick}
                 >
-                    {favorite ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
+                    {favorite ? <FavoriteIcon sx={{ color: "purple"}} /> : <FavoriteBorderIcon />}
                 </IconButton>
             </Box>
             <Box

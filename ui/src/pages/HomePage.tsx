@@ -26,25 +26,23 @@ const categories = [
 ];
 
 const HomePage: React.FC = () => {
-    const [searchQuery, setSearchQuery] = useState(""); // Holds the user input or current category
-    const [searchResults, setSearchResults] = useState<ProductDto[]>([]); // Holds the resulting products
-    const [isSearching, setIsSearching] = useState(false); // Toggles between default and result view
-    const productApi = new ProductControllerApi(); // Instance of ProductController API
-    const searchBarRef = useRef<HTMLInputElement>(null); // Ref for the search bar input
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState<ProductDto[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const productApi = new ProductControllerApi();
+    const searchBarRef = useRef<HTMLInputElement>(null);
 
-    // Focus on the search bar when the page loads
     useEffect(() => {
         if (searchBarRef.current) {
             searchBarRef.current.focus();
         }
     }, []);
 
-    // Handle text-based search
     const handleSearch = () => {
-        if (searchQuery.trim() === "") return; // Ignore empty queries
+        if (searchQuery.trim() === "") return;
 
         productApi
-            .searchProducts(searchQuery) // Backend API call for search
+            .searchProducts(searchQuery)
             .then((response) => {
                 setSearchResults(response.data);
                 setIsSearching(true);
@@ -61,14 +59,12 @@ const HomePage: React.FC = () => {
         }
     };
 
-    // Handle category-based search
     const handleCategorySearch = (categoryValue: string) => {
         productApi
-            .getProductsByCategory(categoryValue) // Backend API call for category search
+            .getProductsByCategory(categoryValue)
             .then((response) => {
                 setSearchResults(response.data);
                 setIsSearching(true);
-                // Update the search query to display selected category name
                 setSearchQuery(`Category: ${categories.find((cat) => cat.value === categoryValue)?.name}`);
             })
             .catch((error) => {
@@ -118,7 +114,7 @@ const HomePage: React.FC = () => {
                                 alignItems: "center",
                                 width: "100%",
                                 maxWidth: 600,
-                                mb: 4, // Margin below search bar
+                                mb: 4,
                             }}
                         >
                             <TextField
@@ -128,8 +124,8 @@ const HomePage: React.FC = () => {
                                 placeholder="Search for something..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={handleKeyDown} // Added Enter key event listener
-                                sx={{ mr: 1 }} // Margin-right for space between search bar and button
+                                onKeyDown={handleKeyDown}
+                                sx={{ mr: 1 }}
                             />
                             <Button variant="contained" color="secondary" onClick={handleSearch}>
                                 Search
@@ -147,7 +143,7 @@ const HomePage: React.FC = () => {
                                             boxShadow: "0 1px 5px rgba(0,0,0,0.3)",
                                             "&:hover": { boxShadow: "0 2px 10px rgba(0,0,0,0.4)" },
                                         }}
-                                        onClick={() => handleCategorySearch(category.value)} // Trigger category search
+                                        onClick={() => handleCategorySearch(category.value)}
                                     >
                                         <CardContent>
                                             <Typography variant="h6" component="div">
@@ -218,7 +214,6 @@ const HomePage: React.FC = () => {
                                             price={product.price}
                                             currency={product.currency || "BGN"}
                                             username={product.ownerName!}
-                                            address={product.ownerAddress}
                                         />
                                     </Link>
                                 ))

@@ -9,7 +9,6 @@ import { jwtDecode } from "jwt-decode";
 const Profile: React.FC = () => {
     const navigate = useNavigate();
 
-    // State to manage product list
     let [products, setProducts] = useState<ProductDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<UserDto | null>({
@@ -25,7 +24,7 @@ const Profile: React.FC = () => {
     });
 
     const goToEditProfile = () => {
-        navigate("/edit-profile", { state: { user } }); // Pass the user data as state to EditProfilePage.tsx
+        navigate("/edit-profile", { state: { user } });
     };
 
 
@@ -38,7 +37,6 @@ const Profile: React.FC = () => {
         navigate("/login"); // Redirect to login page
     };
 
-    // Fetch products when the component loads
     useEffect(() => {
         const productController: ProductControllerApi = new ProductControllerApi();
         productController
